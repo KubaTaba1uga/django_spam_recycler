@@ -14,6 +14,7 @@ aioimaplib = "^0.9.0"
 whitenoise = "5.2.0"
 django-allauth = "0.43.0"
 django-crispy-forms = "1.10.0"
+imap-tools = "^0.50.1"
 
 
 [tool.poetry.dev-dependencies]

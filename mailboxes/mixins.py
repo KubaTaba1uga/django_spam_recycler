@@ -1,5 +1,6 @@
 from django.views.generic.edit import FormMixin
 from shared_code.queries import get_user_owner_mailboxes, get_user_guest_mailboxes
+from shared_code.imap_sync import validate_credentials
 
 
 class ShowMailboxGuestMixin:
@@ -23,7 +24,17 @@ class ShowMailboxOwnerMixin:
 class ValidateMailboxImapMixin(FormMixin):
 
     def form_valid(self, form):
-        print(self.request.POST)
+        """ Validate mailbox by IMAP
+        """
+        if not validate_credentials(
+            server_address=form.data.get('server_address'),
+            email_address=form.data.get('email_address'),
+                password=form.data.get('password')):
+
+            form.add_error(None, 'Mailbox validation failed')
+
+            return super().form_invalid(form)
+
         return super().form_valid(form)
 
 
