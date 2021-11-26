@@ -17,7 +17,7 @@
                     <th>Server Address</th>
                     <th>Owner</th>
                     <th>Guest</th>
-                    <th></th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tfoot>
@@ -26,7 +26,7 @@
                     <th>Server Address</th>
                     <th>Owner</th>
                     <th>Guest</th>
-                    <th></th>
+                    <th>Actions</th>
                 </tr>
             </tfoot>
             <tbody>
@@ -38,6 +38,7 @@
                         <th>False</th>
                         <th>
                             <a href="{% url 'mailbox:mailbox_details_url' mailbox.pk %}" class="btn btn-primary btn-sm">Details</a>
+                            <a href="{% url 'mailbox:mailbox_delete_url' mailbox.pk %}" class="btn btn-danger btn-sm">Delete</a>
                         </th>
                     </tr>
                 {% endfor %}

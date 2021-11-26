@@ -1,6 +1,5 @@
 from imap_tools import MailBox, AND
 from imap_tools.mailbox import MailboxLoginError
-from socket import gaierror
 from imaplib import IMAP4
 
 
@@ -21,11 +20,11 @@ def validate_credentials(server_address, email_address, password):
 
     try:
         return MailBox(server_address).login(email_address, password)
-    except ConnectionRefusedError:
+    except ConnectionRefusedError as e:
         pass
-    except IMAP4.error:
+    except IMAP4.error as e:
         pass
-    except MailboxLoginError:
+    except MailboxLoginError as e:
         pass
 
     return False

@@ -41,6 +41,8 @@ class ValidateMailboxImapMixin(FormMixin):
 class AddMailboxOwnerMixin(FormMixin):
 
         def get_form_kwargs(self):
+            """ Add logged in user as initial `owner` value
+            """
             kwargs = super().get_form_kwargs()
             kwargs['initial']['owner'] = self.request.user
             return kwargs
