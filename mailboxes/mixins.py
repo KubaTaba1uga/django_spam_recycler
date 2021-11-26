@@ -20,10 +20,10 @@ class ShowMailboxOwnerMixin:
         return context
 
 
-class ValidateMailboxImap(FormMixin):
+class ValidateMailboxImapMixin(FormMixin):
 
     def form_valid(self, form):
-        print(self.request)
+        print(self.request.POST)
         return super().form_valid(form)
 
 

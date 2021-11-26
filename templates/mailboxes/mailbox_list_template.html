@@ -3,32 +3,54 @@
 {% block title %}List Mailboxes{% endblock %}
 
 {% block content %}
-<h2 class='d-inline-block'>Guest Mailboxes</h2>
-<div>
-    <table class='table'>
-        
-    {% for mailbox in guest_mailboxes %}
-        <tr>
-            <th>
-                {{mailbox.email_address}}
-            </th>
-        </tr>
-    {% endfor %}
 
-    </table>
-</div>
-<h2 class='d-inline-block'>Your Mailboxes</h2>
-<div>
-    <table class='table'>
-        
-    {% for mailbox in owner_mailboxes %}
-        <tr>
-            <th>
-                {{mailbox.email_address}}
-            </th>
-        </tr>
-    {% endfor %}
-
-    </table>
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-table me-1"></i>
+        <h3 class='d-inline-block'>Mailboxes</h3>
+    </div>
+    <div class="card-body">
+        <table id="datatablesSimple">
+            <thead>
+                <tr>
+                    <th>Email Address</th>
+                    <th>Server Address</th>
+                    <th>Owner</th>
+                    <th>Guest</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th>Email Address</th>
+                    <th>Server Address</th>
+                    <th>Owner</th>
+                    <th>Guest</th>
+                    <th></th>
+                </tr>
+            </tfoot>
+            <tbody>
+                {% for mailbox in owner_mailboxes %}
+                    <tr>
+                        <th>{{mailbox.email_address}}</th>
+                        <th>{{mailbox.server_address}}</th>
+                        <th>True</th>
+                        <th>False</th>
+                        <th>
+                            <a href="{% url 'mailbox:mailbox_details_url' mailbox.pk %}" class="btn btn-primary btn-sm">Details</a>
+                        </th>
+                    </tr>
+                {% endfor %}
+                {% for mailbox in guest_mailboxes %}
+                    <tr>
+                        <th>{{mailbox.email_address}}</th>
+                        <th>{{mailbox.server_address}}</th>
+                        <th>False</th>
+                        <th>True</th>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock content %}

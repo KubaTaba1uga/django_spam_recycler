@@ -1,6 +1,10 @@
 from django.views import generic
 from .models import MailboxModel
-from .mixins import ShowMailboxGuestMixin, ShowMailboxOwnerMixin, AddMailboxOwnerMixin
+from .mixins import (
+    ShowMailboxGuestMixin,
+     ShowMailboxOwnerMixin,
+     AddMailboxOwnerMixin,
+     ValidateMailboxImapMixin)
 from .forms import MailboxCreateForm
 
 
@@ -9,7 +13,7 @@ class MailboxListView(ShowMailboxGuestMixin, ShowMailboxOwnerMixin, generic.List
     model = MailboxModel
 
 
-class MailboxCreateView(AddMailboxOwnerMixin, generic.CreateView):
+class MailboxCreateView(AddMailboxOwnerMixin, ValidateMailboxImapMixin, generic.CreateView):
 
     """ Create mailbox if:
         - email server address is valid

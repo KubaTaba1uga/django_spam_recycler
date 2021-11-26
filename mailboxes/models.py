@@ -22,6 +22,8 @@ class MailboxModel(models.Model):
     guests = models.ManyToManyField(
         get_user_model(),
         through='MailboxGuestModel', related_name="guest_mailbox")
+    """ Users with read-only permissions to `MailboxModel`
+    """
 
     def get_absolute_url(self):
         return reverse("mailboxes:mailbox_details_url", kwargs={"pk": self.pk})
@@ -39,6 +41,8 @@ class MailboxGuestModel(models.Model):
         on_delete=models.CASCADE,
         related_name='guest_mailbox'
     )
+    """ Mailbox to which read-only permissions relate to
+    """
     guest = models.ForeignKey(
         get_user_model(),
         on_delete=models.DO_NOTHING,
