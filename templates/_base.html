@@ -65,7 +65,7 @@
                     </a>
                     <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                         <nav class="sb-sidenav-menu-nested nav">
-                            <a class="nav-link" href="layout-static.html">List All</a>
+                            <a class="nav-link" href="{% url 'mailbox_list_url' %}">List All</a>
                             <a class="nav-link" href="layout-sidenav-light.html">Add New</a>
                             <a class="nav-link" href="layout-sidenav-light.html">Invite Guest</a>
                         </nav>
@@ -93,7 +93,7 @@
       </div>
     <div id="layoutSidenav_content">
                 <main>
-                    <div class="container-fluid">
+                    <div class="container-fluid px-4 mt-2">
                         {% block content %}
                             <p>Default content...</p>
                         {% endblock content %}

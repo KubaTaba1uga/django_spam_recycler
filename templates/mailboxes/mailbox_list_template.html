@@ -1,0 +1,34 @@
+{% extends '_base.html' %}
+
+{% block title %}List Mailboxes{% endblock %}
+
+{% block content %}
+<h2 class='d-inline-block'>Guest Mailboxes</h2>
+<div>
+    <table class='table'>
+        
+    {% for mailbox in guest_mailboxes %}
+        <tr>
+            <th>
+                {{mailbox.email_address}}
+            </th>
+        </tr>
+    {% endfor %}
+
+    </table>
+</div>
+<h2 class='d-inline-block'>Your Mailboxes</h2>
+<div>
+    <table class='table'>
+        
+    {% for mailbox in owner_mailboxes %}
+        <tr>
+            <th>
+                {{mailbox.email_address}}
+            </th>
+        </tr>
+    {% endfor %}
+
+    </table>
+</div>
+{% endblock content %}
