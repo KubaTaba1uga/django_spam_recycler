@@ -30,7 +30,7 @@ class MailboxModel(models.Model):
         return self.email_address
 
     class Meta:
-        unique_together = ('email_address', 'owner')
+        unique_together = ('email_address', 'owner', 'server_address')
 
 
 class MailboxGuestModel(models.Model):

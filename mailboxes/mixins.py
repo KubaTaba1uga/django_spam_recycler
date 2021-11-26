@@ -1,3 +1,4 @@
+from django.views.generic.edit import FormMixin
 from shared_code.queries import get_user_owner_mailboxes, get_user_guest_mailboxes
 
 
@@ -17,3 +18,18 @@ class ShowMailboxOwnerMixin:
         context['owner_mailboxes'] = get_user_owner_mailboxes(
             self.request.user)
         return context
+
+
+class ValidateMailboxImap(FormMixin):
+
+    def form_valid(self, form):
+        print(self.request)
+        return super().form_valid(form)
+
+
+class AddMailboxOwnerMixin(FormMixin):
+
+        def get_form_kwargs(self):
+            kwargs = super().get_form_kwargs()
+            kwargs['initial']['owner'] = self.request.user
+            return kwargs

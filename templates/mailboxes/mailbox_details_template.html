@@ -1,0 +1,25 @@
+{% extends '_base.html' %}
+
+{% block title %}Mailbox{% endblock %}
+
+{% block content %}
+<h2 class='d-inline-block'>Mailbox</h2>
+<div class='container'>
+    <dl class='row'>
+        <dt class="col-sm-3">Email Address</dt>
+        <dd class="col-sm-9">{{ mailbox.email_address }}</dd>
+        <dt class="col-sm-3">Server Address</dt>
+        <dd class="col-sm-9">{{ mailbox.server_address }}</dd>
+        <dt class="col-sm-3">Owner</dt>
+        <dd class="col-sm-9">{{ mailbox.owner }}</dd>
+        <dt class="col-sm-3">Guests</dt>
+        <dd>
+            <ul>
+                {% for guest in mailbox.guests.all %}
+                <li> {{ guest }} </li>
+                {% endfor %}
+            </ul>    
+        </dd>
+    </dl>
+</div>
+{% endblock content%} 
