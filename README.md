@@ -17,12 +17,12 @@
 ----
 
 TO-DO
-  Make it as two seperate celery workers:
-    1. async email download 
-    2. async spam evaluation
-  Create new queue when task is added:
-    1. Create queues dynamically
-    2. https://docs.celeryproject.org/en/stable/userguide/routing.html
+  Make it as two seperate celery workers:<br>
+    1. async email download <br>
+    2. async spam evaluation <br>
+  Create new queue when task is added: <br>
+    1. Create queues dynamically <br>
+    2. https://docs.celeryproject.org/en/stable/userguide/routing.html <br>
 
 
 ## Table of Contents
