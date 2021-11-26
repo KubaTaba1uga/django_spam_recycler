@@ -270,7 +270,7 @@ python-versions = ">=3.5"
 name = "django-debug-toolbar"
 version = "3.2"
 description = "A configurable set of panels that display various debug information about the current request/response."
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6"
 
@@ -311,6 +311,14 @@ description = "Internationalized Domain Names in Applications (IDNA)"
 category = "main"
 optional = false
 python-versions = ">=3.5"
+
+[[package]]
+name = "imap-tools"
+version = "0.50.1"
+description = "Work with email by IMAP"
+category = "main"
+optional = false
+python-versions = "*"
 
 [[package]]
 name = "kombu"
@@ -545,7 +553,7 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "0eb7501b30dd1b75aa98fad171e27fc83562ea20eb7eed20647af3bb36400124"
+content-hash = "7796db43bb085ece27cab8193d4aaa427a42171b17aa1b41b0a1a684fc071e57"
 
 [metadata.files]
 aioimaplib = [
@@ -710,6 +718,10 @@ humanize = [
 idna = [
     {file = "idna-3.3-py3-none-any.whl", hash = "sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff"},
     {file = "idna-3.3.tar.gz", hash = "sha256:9d643ff0a55b762d5cdb124b8eaa99c66322e2157b69160bc32796e824360e6d"},
+]
+imap-tools = [
+    {file = "imap-tools-0.50.1.tar.gz", hash = "sha256:9f1a2629b8e0cc7be6da65bc32d50dc16d8af750463f1342759ec796c83997eb"},
+    {file = "imap_tools-0.50.1-py3-none-any.whl", hash = "sha256:a0674af95b41bee7eeafdf8b1a02e987dad05544e5c7630947d2bea9e8759f73"},
 ]
 kombu = [
     {file = "kombu-5.2.2-py3-none-any.whl", hash = "sha256:d36f0cde6a18d9eb7b6b3aa62a59bfdff7f5724689850e447eca5be8efc9d501"},
