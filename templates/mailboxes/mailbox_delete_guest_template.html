@@ -1,0 +1,11 @@
+{% extends '_base.html' %}
+
+{% block title %}Delete Mailbox{% endblock %}
+
+{% block content %}
+  <h1>Delete Guest</h1>
+  <form method="post">{% csrf_token %}
+    <p>Are you sure you want to delete "{{ mailbox_guest.guest.username }}" from "{{mailbox_guest.mailbox.email_address}}"?</p>
+    <button class="btn btn-danger ml-2" type="submit">Confirm</button>
+  </form>
+{% endblock content %}

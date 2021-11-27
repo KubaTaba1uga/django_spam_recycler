@@ -12,14 +12,43 @@
         <dd class="col-sm-9">{{ mailbox.server_address }}</dd>
         <dt class="col-sm-3">Owner</dt>
         <dd class="col-sm-9">{{ mailbox.owner }}</dd>
-        <dt class="col-sm-3">Guests</dt>
-        <dd class="col-sm-9">
-            <ul>
-                {% for guest in mailbox.guests.all %}
-                <li> {{ guest }} </li>
-                {% endfor %}
-            </ul>    
-        </dd>
     </dl>
+</div>
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-table me-1"></i>
+        <h5 class='d-inline-block'>Guests</h5>
+    </div>
+    <div class="card-body">
+        <table id="datatablesSimple">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email Address</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th>Username</th>
+                    <th>Email Address</th>
+                    <th></th>
+                </tr>
+            </tfoot>
+            <tbody>
+                {% for mailbox in mailbox_guests %}
+                    <tr>
+                        <th> {{ mailbox.guest.username }} </th>
+                        <th> {{ mailbox.guest.email }} </th>
+                        <th>
+                            {% if mailbox.mailbox.owner == user %}
+                                <a href="{% url 'mailbox:mailbox_guest_delete_url' mailbox.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                            {% endif %}
+                        </th>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock content%} 

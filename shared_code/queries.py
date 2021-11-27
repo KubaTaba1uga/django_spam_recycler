@@ -37,3 +37,7 @@ def get_mailbox_guests_query(mailbox_id):
 
 def get_mailbox_guests(mailbox_id):
     return (guest_mailbox.guest for guest_mailbox in get_mailbox_guests_query(mailbox_id))
+
+
+def get_guest_mailbox(mailbox_id):
+    return (guest_mailbox for guest_mailbox in get_mailbox_guests_query(mailbox_id))
