@@ -9,7 +9,8 @@ from .mixins import (
     PassLoggedUserToFormMixin,
     MailboxOwnerOnlyMixin,
     MailboxOwnerAndGuestOnlyMixin,
-    ShowMailboxGuestsMixin)
+    ShowMailboxGuestsMixin,
+    GuestMailboxOwnerOnlyMixin)
 from .forms import MailboxCreateForm, MailboxUpdateForm, MailboxAddGuestForm
 
 
@@ -55,7 +56,7 @@ class MailboxAddGuestView(PassLoggedUserToFormMixin, generic.CreateView):
     form_class = MailboxAddGuestForm
 
 
-class MailboxGuestDeleteView(MailboxOwnerOnlyMixin, generic.DeleteView):
+class MailboxGuestDeleteView(GuestMailboxOwnerOnlyMixin, generic.DeleteView):
     template_name = 'mailboxes/mailbox_delete_guest_template.html'
     model = MailboxGuestModel
     context_object_name = 'mailbox_guest'

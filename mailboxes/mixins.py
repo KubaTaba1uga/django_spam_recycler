@@ -4,7 +4,8 @@ from shared_code.queries import (
      get_user_guest_mailboxes,
      get_mailbox_owner,
      get_guest_mailbox,
-     get_mailbox_guests)
+     get_mailbox_guests,
+     get_guest)
 from shared_code.imap_sync import validate_credentials
 from django.core.exceptions import PermissionDenied
 
@@ -110,6 +111,20 @@ class MailboxOwnerAndGuestOnlyMixin:
         is_guest = self.request.user in get_mailbox_guests(mailbox_id)
 
         if is_owner or is_guest:
+            return super().dispatch(request, *args, **kwargs)
+        else:
+            raise PermissionDenied
+
+
+class GuestMailboxOwnerOnlyMixin:
+
+    def dispatch(self, request, *args, **kwargs):
+        """ Allow user if is owner of guest_mailbox
+        """
+
+        guest_mailbox = get_guest(self.kwargs.get('pk'))
+
+        if guest_mailbox and guest_mailbox.mailbox.owner == self.request.user:
             return super().dispatch(request, *args, **kwargs)
         else:
             raise PermissionDenied
