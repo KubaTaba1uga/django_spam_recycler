@@ -1,6 +1,5 @@
-from imap_tools import MailBox, AND
-from imap_tools.mailbox import MailboxLoginError
-from imaplib import IMAP4
+from imap_tools import MailBox
+import logging
 
 
 def validate_credentials(server_address, email_address, password):
@@ -20,11 +19,17 @@ def validate_credentials(server_address, email_address, password):
 
     try:
         return MailBox(server_address).login(email_address, password)
-    except ConnectionRefusedError as e:
-        pass
-    except IMAP4.error as e:
-        pass
-    except MailboxLoginError as e:
-        pass
+    except Exception as e:
+        logging.warning(f"Validate creadentials failed {e}\n email address: {email_address}\n server address {server_address}")
+    """ Because exceptions types thrown by `imap_tools` are too much,
+            `Exception` is used
 
+        Example of code before:
+            except ConnectionRefusedError:
+                pass
+             except IMAP4.error:
+                pass
+             except MailboxLoginError:
+                pass
+    """
     return False
