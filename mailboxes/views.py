@@ -1,12 +1,12 @@
 from django.views import generic
 from django.urls import reverse_lazy
-from .models import MailboxModel
+from .models import MailboxModel, MailboxGuestModel
 from .mixins import (
     ShowMailboxGuestMixin,
      ShowMailboxOwnerMixin,
      AddMailboxOwnerMixin,
-     ValidateMailboxImapMixin)
-from .forms import MailboxCreateForm, MailboxUpdateForm
+     ValidateMailboxImapMixin, AddOwnedMailboxMixin, PassLoggedUserToForm)
+from .forms import MailboxCreateForm, MailboxUpdateForm, MailboxAddGuestForm
 
 
 class MailboxListView(ShowMailboxGuestMixin, ShowMailboxOwnerMixin, generic.ListView):
@@ -43,3 +43,9 @@ class MailboxDeleteView(generic.DeleteView):
     model = MailboxModel
     context_object_name = 'mailbox'
     success_url = reverse_lazy('mailboxes:mailbox_list_url')
+
+
+class MailboxAddGuestView(PassLoggedUserToForm, generic.CreateView):
+    template_name = 'mailboxes/mailbox_add_guest_template.html'
+    model = MailboxGuestModel
+    form_class = MailboxAddGuestForm

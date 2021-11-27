@@ -8,8 +8,12 @@ def get_user_guest_mailboxes(user):
     return (guest_mailbox.mailbox for guest_mailbox in MailboxGuestModel.objects.filter(guest=user).all())
 
 
+def get_user_owner_mailboxes_query(user):
+    return MailboxModel.objects.filter(owner=user).all()
+
+
 def get_user_owner_mailboxes(user):
     """
     Returns owned mailboxes of a user.
     """
-    return (owned_mailbox for owned_mailbox in MailboxModel.objects.filter(owner=user).all())
+    return (owned_mailbox for owned_mailbox in get_user_owner_mailboxes_query(user))

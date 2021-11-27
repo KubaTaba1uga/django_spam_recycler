@@ -1,4 +1,5 @@
-from .models import MailboxModel
+from shared_code.queries import get_user_owner_mailboxes_query
+from .models import MailboxModel, MailboxGuestModel
 from django import forms
 
 
@@ -22,3 +23,19 @@ class MailboxUpdateForm(PasswordForm):
     class Meta:
         model = MailboxModel
         exclude = ['owner', 'guests']
+
+
+class MailboxAddGuestForm(forms.ModelForm):
+
+    """ Only owners can add guests
+    """
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user')
+        super().__init__(*args, **kwargs)
+        self.fields[
+            'mailbox'].queryset = get_user_owner_mailboxes_query(self.user)
+
+    class Meta:
+        model = MailboxGuestModel
+        exclude = ['owner', 'server_address']

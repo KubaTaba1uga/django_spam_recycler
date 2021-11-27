@@ -51,6 +51,9 @@ class MailboxGuestModel(models.Model):
     """ User with read-only permissions to `MailboxModel`
     """
 
+    def get_absolute_url(self):
+        return reverse("mailboxes:mailbox_details_url", kwargs={"pk": self.pk})
+
     def __str__(self) -> str:
         return f"{self.mailbox}+{self.guest}"
 
