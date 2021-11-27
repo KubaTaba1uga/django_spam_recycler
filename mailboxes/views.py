@@ -6,7 +6,7 @@ from .mixins import (
      ShowMailboxOwnerMixin,
      AddMailboxOwnerMixin,
      ValidateMailboxImapMixin)
-from .forms import MailboxCreateForm
+from .forms import MailboxCreateForm, MailboxUpdateForm
 
 
 class MailboxListView(ShowMailboxGuestMixin, ShowMailboxOwnerMixin, generic.ListView):
@@ -24,6 +24,12 @@ class MailboxCreateView(AddMailboxOwnerMixin, ValidateMailboxImapMixin, generic.
     template_name = 'mailboxes/mailbox_create_template.html'
     model = MailboxModel
     form_class = MailboxCreateForm
+
+
+class MailboxEditView(ValidateMailboxImapMixin, generic.UpdateView):
+    template_name = 'mailboxes/mailbox_edit_template.html'
+    model = MailboxModel
+    form_class = MailboxUpdateForm
 
 
 class MailboxDetailsView(generic.DetailView):
