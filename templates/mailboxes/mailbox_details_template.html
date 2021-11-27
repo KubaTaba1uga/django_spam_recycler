@@ -13,7 +13,7 @@
         <dt class="col-sm-3">Owner</dt>
         <dd class="col-sm-9">{{ mailbox.owner }}</dd>
         <dt class="col-sm-3">Guests</dt>
-        <dd>
+        <dd class="col-sm-9">
             <ul>
                 {% for guest in mailbox.guests.all %}
                 <li> {{ guest }} </li>

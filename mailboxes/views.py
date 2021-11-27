@@ -5,7 +5,7 @@ from .mixins import (
     ShowMailboxGuestMixin,
      ShowMailboxOwnerMixin,
      AddMailboxOwnerMixin,
-     ValidateMailboxImapMixin, AddOwnedMailboxMixin, PassLoggedUserToForm)
+     ValidateMailboxImapMixin, PassLoggedUserToFormMixin, MailboxOwnerOnlyMixin)
 from .forms import MailboxCreateForm, MailboxUpdateForm, MailboxAddGuestForm
 
 
@@ -26,7 +26,7 @@ class MailboxCreateView(AddMailboxOwnerMixin, ValidateMailboxImapMixin, generic.
     form_class = MailboxCreateForm
 
 
-class MailboxEditView(ValidateMailboxImapMixin, generic.UpdateView):
+class MailboxEditView(MailboxOwnerOnlyMixin, ValidateMailboxImapMixin, generic.UpdateView):
     template_name = 'mailboxes/mailbox_edit_template.html'
     model = MailboxModel
     form_class = MailboxUpdateForm
@@ -45,7 +45,7 @@ class MailboxDeleteView(generic.DeleteView):
     success_url = reverse_lazy('mailboxes:mailbox_list_url')
 
 
-class MailboxAddGuestView(PassLoggedUserToForm, generic.CreateView):
+class MailboxAddGuestView(PassLoggedUserToFormMixin, generic.CreateView):
     template_name = 'mailboxes/mailbox_add_guest_template.html'
     model = MailboxGuestModel
     form_class = MailboxAddGuestForm
