@@ -1,19 +1,33 @@
 from django.views.generic.edit import FormMixin
-from shared_code.queries import get_user_owner_mailboxes, get_user_guest_mailboxes, get_mailbox_owner, get_mailbox_guests
+from shared_code.queries import (
+    get_user_owner_mailboxes,
+     get_user_guest_mailboxes,
+     get_mailbox_owner,
+     get_guest_mailbox,
+     get_mailbox_guests)
 from shared_code.imap_sync import validate_credentials
 from django.core.exceptions import PermissionDenied
 
 
-class ShowMailboxGuestMixin:
+class ShowGuestMailboxListMixin:
+
+    """
+    Show mailboxes which user is guest of
+    """
 
     def get_context_data(self, **kwargs):
+
         context = super().get_context_data(**kwargs)
         context['guest_mailboxes'] = get_user_guest_mailboxes(
             self.request.user)
         return context
 
 
-class ShowMailboxOwnerMixin:
+class ShowOwnerMailboxListMixin:
+
+    """
+    Show mailboxes which user is owner of
+    """
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -24,9 +38,11 @@ class ShowMailboxOwnerMixin:
 
 class ValidateMailboxImapMixin(FormMixin):
 
+    """
+    Validate mailbox by IMAP
+    """
+
     def form_valid(self, form):
-        """ Validate mailbox by IMAP
-        """
         if not validate_credentials(
             server_address=form.data.get('server_address'),
             email_address=form.data.get('email_address'),
@@ -73,7 +89,7 @@ class PassLoggedUserToFormMixin(FormMixin):
 class MailboxOwnerOnlyMixin:
 
     def dispatch(self, request, *args, **kwargs):
-        """ Check if user is owner of mailbox
+        """ Allow user if is owner of mailbox
         """
 
         if not get_mailbox_owner(self.kwargs.get('pk', 0)) == self.request.user:
@@ -85,7 +101,7 @@ class MailboxOwnerOnlyMixin:
 class MailboxOwnerAndGuestOnlyMixin:
 
     def dispatch(self, request, *args, **kwargs):
-        """ Check if user is owner or guest of mailbox
+        """ Allow user if is owner or guest of mailbox
         """
         mailbox_id = self.kwargs.get('pk', 0)
 
@@ -97,3 +113,12 @@ class MailboxOwnerAndGuestOnlyMixin:
             return super().dispatch(request, *args, **kwargs)
         else:
             raise PermissionDenied
+
+
+class ShowMailboxGuestsMixin:
+
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            context['mailbox_guests'] = get_guest_mailbox(
+                self.kwargs.get('pk', 0))
+            return context

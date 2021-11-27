@@ -6,7 +6,8 @@ from .views import (
      MailboxDetailsView,
      MailboxDeleteView,
      MailboxEditView,
-     MailboxAddGuestView)
+     MailboxAddGuestView,
+     MailboxGuestDeleteView)
 
 urlpatterns = [
     path('list', MailboxListView.as_view(), name='mailbox_list_url'),
@@ -24,6 +25,8 @@ urlpatterns = [
         '<int:pk>/edit',
         MailboxEditView.as_view(),
      name='mailbox_edit_url'),
-
-
+    path(
+        'delete_guest/<int:pk>',
+        MailboxGuestDeleteView.as_view(),
+     name='mailbox_guest_delete_url'),
 ]

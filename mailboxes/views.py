@@ -2,17 +2,18 @@ from django.views import generic
 from django.urls import reverse_lazy
 from .models import MailboxModel, MailboxGuestModel
 from .mixins import (
-    ShowMailboxGuestMixin,
-    ShowMailboxOwnerMixin,
+    ShowGuestMailboxListMixin,
+    ShowOwnerMailboxListMixin,
     AddMailboxOwnerMixin,
     ValidateMailboxImapMixin,
     PassLoggedUserToFormMixin,
     MailboxOwnerOnlyMixin,
-    MailboxOwnerAndGuestOnlyMixin)
+    MailboxOwnerAndGuestOnlyMixin,
+    ShowMailboxGuestsMixin)
 from .forms import MailboxCreateForm, MailboxUpdateForm, MailboxAddGuestForm
 
 
-class MailboxListView(ShowMailboxGuestMixin, ShowMailboxOwnerMixin, generic.ListView):
+class MailboxListView(ShowOwnerMailboxListMixin, ShowGuestMailboxListMixin, generic.ListView):
     template_name = 'mailboxes/mailbox_list_template.html'
     model = MailboxModel
 
@@ -35,7 +36,7 @@ class MailboxEditView(MailboxOwnerOnlyMixin, ValidateMailboxImapMixin, generic.U
     form_class = MailboxUpdateForm
 
 
-class MailboxDetailsView(MailboxOwnerAndGuestOnlyMixin, generic.DetailView):
+class MailboxDetailsView(ShowMailboxGuestsMixin, MailboxOwnerAndGuestOnlyMixin, generic.DetailView):
     template_name = 'mailboxes/mailbox_details_template.html'
     model = MailboxModel
     context_object_name = 'mailbox'
@@ -52,3 +53,15 @@ class MailboxAddGuestView(PassLoggedUserToFormMixin, generic.CreateView):
     template_name = 'mailboxes/mailbox_add_guest_template.html'
     model = MailboxGuestModel
     form_class = MailboxAddGuestForm
+
+
+class MailboxGuestDeleteView(MailboxOwnerOnlyMixin, generic.DeleteView):
+    template_name = 'mailboxes/mailbox_delete_guest_template.html'
+    model = MailboxGuestModel
+    context_object_name = 'mailbox_guest'
+    success_url = reverse_lazy('mailboxes:mailbox_list_url')
+
+    def get_success_url(self):
+        """Overwrite success url to redirect to mailbox details view
+        """
+        return reverse_lazy('mailboxes:mailbox_details_url', kwargs={'pk': self.object.mailbox.pk})

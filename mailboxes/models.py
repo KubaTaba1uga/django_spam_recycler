@@ -52,7 +52,7 @@ class MailboxGuestModel(models.Model):
     """
 
     def get_absolute_url(self):
-        return reverse("mailboxes:mailbox_details_url", kwargs={"pk": self.pk})
+        return reverse("mailboxes:mailbox_details_url", kwargs={"pk": self.mailbox.pk})
 
     def __str__(self) -> str:
         return f"{self.mailbox}+{self.guest}"
