@@ -1,5 +1,5 @@
 from django.views.generic.edit import FormMixin
-from shared_code.queries import get_user_owner_mailboxes, get_user_guest_mailboxes, get_mailbox_owner_query
+from shared_code.queries import get_user_owner_mailboxes, get_user_guest_mailboxes, get_mailbox_owner, get_mailbox_guests
 from shared_code.imap_sync import validate_credentials
 from django.core.exceptions import PermissionDenied
 
@@ -76,7 +76,7 @@ class MailboxOwnerOnlyMixin:
         """ Check if user is owner of mailbox
         """
 
-        if not get_mailbox_owner_query(self.kwargs.get('pk', 0)) == self.request.user:
+        if not get_mailbox_owner(self.kwargs.get('pk', 0)) == self.request.user:
             raise PermissionDenied('You are not owner of this mailbox')
 
         return super().dispatch(request, *args, **kwargs)
@@ -87,7 +87,13 @@ class MailboxOwnerAndGuestOnlyMixin:
     def dispatch(self, request, *args, **kwargs):
         """ Check if user is owner or guest of mailbox
         """
-        if not get_mailbox_owner_query(self.kwargs.get('pk', 0)) == self.request.user:
-            raise PermissionDenied('You are not owner of this mailbox')
+        mailbox_id = self.kwargs.get('pk', 0)
 
-        return super().dispatch(request, *args, **kwargs)
+        is_owner = get_mailbox_owner(mailbox_id) == self.request.user
+
+        is_guest = self.request.user in get_mailbox_guests(mailbox_id)
+
+        if is_owner or is_guest:
+            return super().dispatch(request, *args, **kwargs)
+        else:
+            raise PermissionDenied

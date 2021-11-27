@@ -21,3 +21,15 @@ def get_user_owner_mailboxes(user):
 
 def get_mailbox_owner_query(mailbox_id):
     return MailboxModel.objects.filter(pk=mailbox_id).first().owner
+
+
+def get_mailbox_owner(mailbox_id):
+    return get_mailbox_owner_query(mailbox_id)
+
+
+def get_mailbox_guests_query(mailbox_id):
+    return MailboxGuestModel.objects.filter(mailbox_id=mailbox_id).all()
+
+
+def get_mailbox_guests(mailbox_id):
+    return (guest_mailbox.guest for guest_mailbox in get_mailbox_guests_query(mailbox_id))

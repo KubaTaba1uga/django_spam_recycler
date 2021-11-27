@@ -3,9 +3,12 @@ from django.urls import reverse_lazy
 from .models import MailboxModel, MailboxGuestModel
 from .mixins import (
     ShowMailboxGuestMixin,
-     ShowMailboxOwnerMixin,
-     AddMailboxOwnerMixin,
-     ValidateMailboxImapMixin, PassLoggedUserToFormMixin, MailboxOwnerOnlyMixin)
+    ShowMailboxOwnerMixin,
+    AddMailboxOwnerMixin,
+    ValidateMailboxImapMixin,
+    PassLoggedUserToFormMixin,
+    MailboxOwnerOnlyMixin,
+    MailboxOwnerAndGuestOnlyMixin)
 from .forms import MailboxCreateForm, MailboxUpdateForm, MailboxAddGuestForm
 
 
@@ -32,7 +35,7 @@ class MailboxEditView(MailboxOwnerOnlyMixin, ValidateMailboxImapMixin, generic.U
     form_class = MailboxUpdateForm
 
 
-class MailboxDetailsView(generic.DetailView):
+class MailboxDetailsView(MailboxOwnerAndGuestOnlyMixin, generic.DetailView):
     template_name = 'mailboxes/mailbox_details_template.html'
     model = MailboxModel
     context_object_name = 'mailbox'
