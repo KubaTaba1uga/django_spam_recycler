@@ -49,6 +49,9 @@
                         <th>{{mailbox.server_address}}</th>
                         <th>False</th>
                         <th>True</th>
+                        <th>
+                            <a href="{% url 'mailbox:mailbox_details_url' mailbox.pk %}" class="btn btn-primary btn-sm">Details</a>
+                        </th>
                     </tr>
                 {% endfor %}
             </tbody>
