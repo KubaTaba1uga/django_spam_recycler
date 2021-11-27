@@ -2,10 +2,12 @@
 
 {% block title %}Invite Guest{% endblock %}
 
+{% load crispy_forms_tags %}
+
 {% block content %}
 <h2 class='d-inline-block'>Invite Guest</h2>
   <form method="post">{% csrf_token %}
-    {{ form.as_p }}
+    {{ form|crispy }}
     <button class="btn btn-success ml-2" type="submit">Invite</button>
 </form>
 {% endblock %}

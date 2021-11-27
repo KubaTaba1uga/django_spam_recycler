@@ -2,10 +2,12 @@
 
 {% block title %}Edit Mailbox{% endblock %}
 
+{% load crispy_forms_tags %}
+
 {% block content %}
 <h2 class='d-inline-block'>Edit Mailbox</h2>
   <form method="post">{% csrf_token %}
-    {{ form.as_p }}
+    {{ form|crispy }}
     <button class="btn btn-success ml-2" type="submit">Save</button>
   </form>
 {% endblock %}
