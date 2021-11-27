@@ -1,0 +1,11 @@
+{% extends '_base.html' %}
+
+{% block title %}Edit Mailbox{% endblock %}
+
+{% block content %}
+<h2 class='d-inline-block'>Edit Mailbox</h2>
+  <form method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn btn-success ml-2" type="submit">Save</button>
+  </form>
+{% endblock %}

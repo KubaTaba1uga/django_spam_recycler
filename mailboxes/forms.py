@@ -2,8 +2,11 @@ from .models import MailboxModel
 from django import forms
 
 
-class MailboxCreateForm(forms.ModelForm):
+class PasswordForm(forms.ModelForm):
     password = forms.CharField(max_length=32, widget=forms.PasswordInput)
+
+
+class MailboxCreateForm(PasswordForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -12,3 +15,10 @@ class MailboxCreateForm(forms.ModelForm):
     class Meta:
         model = MailboxModel
         exclude = ['guests']
+
+
+class MailboxUpdateForm(PasswordForm):
+
+    class Meta:
+        model = MailboxModel
+        exclude = ['owner', 'guests']

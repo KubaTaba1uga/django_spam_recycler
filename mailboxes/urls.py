@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import MailboxListView, MailboxCreateView, MailboxDetailsView, MailboxDeleteView
+from .views import MailboxListView, MailboxCreateView, MailboxDetailsView, MailboxDeleteView, MailboxEditView
 
 urlpatterns = [
     path('list', MailboxListView.as_view(), name='mailbox_list_url'),
@@ -9,9 +9,13 @@ urlpatterns = [
         '<int:pk>/detail',
         MailboxDetailsView.as_view(),
      name='mailbox_details_url'),
-         path(
+    path(
         '<int:pk>/delete',
         MailboxDeleteView.as_view(),
      name='mailbox_delete_url'),
+    path(
+        '<int:pk>/edit',
+        MailboxEditView.as_view(),
+     name='mailbox_edit_url'),
 
 ]
