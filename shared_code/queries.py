@@ -19,12 +19,16 @@ def get_user_owner_mailboxes(user):
     return (owned_mailbox for owned_mailbox in get_user_owner_mailboxes_query(user))
 
 
-def get_mailbox_owner_query(mailbox_id):
-    return MailboxModel.objects.filter(pk=mailbox_id).first().owner
+def get_mailbox_query(mailbox_id):
+    return MailboxModel.objects.filter(pk=mailbox_id).first()
 
 
 def get_mailbox_owner(mailbox_id):
-    return get_mailbox_owner_query(mailbox_id)
+    """
+    Returns owner of a mailbox or None if mailbox does not exist
+    """
+    if get_mailbox_query(mailbox_id):
+        return get_mailbox_query(mailbox_id).owner
 
 
 def get_mailbox_guests_query(mailbox_id):

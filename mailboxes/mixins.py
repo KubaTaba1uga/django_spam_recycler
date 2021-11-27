@@ -73,7 +73,7 @@ class PassLoggedUserToFormMixin(FormMixin):
 class MailboxOwnerOnlyMixin:
 
     def dispatch(self, request, *args, **kwargs):
-        """ Check if user is owner of mailbox
+        """ Allow user if is owner of mailbox
         """
 
         if not get_mailbox_owner(self.kwargs.get('pk', 0)) == self.request.user:
@@ -85,7 +85,7 @@ class MailboxOwnerOnlyMixin:
 class MailboxOwnerAndGuestOnlyMixin:
 
     def dispatch(self, request, *args, **kwargs):
-        """ Check if user is owner or guest of mailbox
+        """ Allow user if is owner or guest of mailbox
         """
         mailbox_id = self.kwargs.get('pk', 0)
 
