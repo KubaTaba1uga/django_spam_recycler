@@ -19,6 +19,15 @@ def get_user_owner_mailboxes(user):
     return (owned_mailbox for owned_mailbox in get_user_owner_mailboxes_query(user))
 
 
+def get_user_owner_mailboxes_tuples(user):
+    """
+    Return owned mailboxes of a user as tuple
+        example:
+            (instance.email_address, instance)
+    """
+    return ((owned_mailbox.email_address, owned_mailbox) for owned_mailbox in get_user_owner_mailboxes_query(user))
+
+
 def get_mailbox_query(mailbox_id):
     return MailboxModel.objects.filter(pk=mailbox_id).first()
 
