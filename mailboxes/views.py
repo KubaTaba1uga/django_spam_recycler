@@ -1,5 +1,6 @@
 from django.views import generic
 from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import MailboxModel, MailboxGuestModel
 from .mixins import (
     ShowGuestMailboxListMixin,
@@ -14,12 +15,12 @@ from .mixins import (
 from .forms import MailboxCreateForm, MailboxUpdateForm, MailboxAddGuestForm
 
 
-class MailboxListView(ShowOwnerMailboxListMixin, ShowGuestMailboxListMixin, generic.ListView):
+class MailboxListView(LoginRequiredMixin, ShowOwnerMailboxListMixin, ShowGuestMailboxListMixin, generic.ListView):
     template_name = 'mailboxes/mailbox_list_template.html'
     model = MailboxModel
 
 
-class MailboxCreateView(AddMailboxOwnerMixin, ValidateMailboxImapMixin, generic.CreateView):
+class MailboxCreateView(LoginRequiredMixin, AddMailboxOwnerMixin, ValidateMailboxImapMixin, generic.CreateView):
 
     """ Create mailbox if:
         - email server address is valid
@@ -31,32 +32,32 @@ class MailboxCreateView(AddMailboxOwnerMixin, ValidateMailboxImapMixin, generic.
     form_class = MailboxCreateForm
 
 
-class MailboxEditView(MailboxOwnerOnlyMixin, ValidateMailboxImapMixin, generic.UpdateView):
+class MailboxEditView(LoginRequiredMixin, MailboxOwnerOnlyMixin, ValidateMailboxImapMixin, generic.UpdateView):
     template_name = 'mailboxes/mailbox_edit_template.html'
     model = MailboxModel
     form_class = MailboxUpdateForm
 
 
-class MailboxDetailsView(ShowMailboxGuestsMixin, MailboxOwnerAndGuestOnlyMixin, generic.DetailView):
+class MailboxDetailsView(LoginRequiredMixin, ShowMailboxGuestsMixin, MailboxOwnerAndGuestOnlyMixin, generic.DetailView):
     template_name = 'mailboxes/mailbox_details_template.html'
     model = MailboxModel
     context_object_name = 'mailbox'
 
 
-class MailboxDeleteView(generic.DeleteView):
+class MailboxDeleteView(LoginRequiredMixin, generic.DeleteView):
     template_name = 'mailboxes/mailbox_delete_template.html'
     model = MailboxModel
     context_object_name = 'mailbox'
     success_url = reverse_lazy('mailboxes:mailbox_list_url')
 
 
-class MailboxAddGuestView(PassLoggedUserToFormMixin, generic.CreateView):
+class MailboxAddGuestView(LoginRequiredMixin, PassLoggedUserToFormMixin, generic.CreateView):
     template_name = 'mailboxes/mailbox_add_guest_template.html'
     model = MailboxGuestModel
     form_class = MailboxAddGuestForm
 
 
-class MailboxGuestDeleteView(GuestMailboxOwnerOnlyMixin, generic.DeleteView):
+class MailboxGuestDeleteView(LoginRequiredMixin, GuestMailboxOwnerOnlyMixin, generic.DeleteView):
     template_name = 'mailboxes/mailbox_delete_guest_template.html'
     model = MailboxGuestModel
     context_object_name = 'mailbox_guest'

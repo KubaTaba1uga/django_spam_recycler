@@ -33,7 +33,8 @@ INSTALLED_APPS = [
     # Local
     'accounts',
     'pages',
-    'mailboxes'
+    'mailboxes',
+    'reports'
 ]
 
 # MIDDLEWARE
@@ -172,7 +173,7 @@ AUTHENTICATION_BACKENDS = (
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
 ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False
-ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True

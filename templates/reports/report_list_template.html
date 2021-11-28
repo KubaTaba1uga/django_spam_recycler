@@ -1,0 +1,61 @@
+{% extends '_base.html' %}
+
+{% block title %}List Reports{% endblock %}
+
+{% block content %}
+
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-table me-1"></i>
+        <h3 class='d-inline-block'>Reports</h3>
+    </div>
+    <div class="card-body">
+        <table id="datatablesSimple">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Mailbox</th>
+                    <th>Created At</th>
+                    <th>Done</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th>Name</th>
+                    <th>Mailbox</th>
+                    <th>Created At</th>
+                    <th>Done</th>
+                    <th>Actions</th>
+                </tr>
+            </tfoot>
+            <tbody>
+                {% for report in report_list %}
+                    <tr>
+                        <th>{{report.name}}</th>
+                        <th>{{report.mailbox}}</th>
+                        <th>{{report.created_at}}</th>
+                        <th>False</th>
+                        <th>
+                            {% comment %} <a href="{% url 'mailbox:mailbox_details_url' mailbox.pk %}" class="btn btn-primary btn-sm">Details</a>
+                            <a href="{% url 'mailbox:mailbox_edit_url' mailbox.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                            <a href="{% url 'mailbox:mailbox_delete_url' mailbox.pk %}" class="btn btn-danger btn-sm">Delete</a> {% endcomment %}
+                        </th>
+                    </tr>
+                {% endfor %}
+                {% for mailbox in guest_mailboxes %}
+                    <tr>
+                        <th>{{mailbox.email_address}}</th>
+                        <th>{{mailbox.server_address}}</th>
+                        <th>False</th>
+                        <th>True</th>
+                        <th>
+                            <a href="{% url 'mailbox:mailbox_details_url' mailbox.pk %}" class="btn btn-primary btn-sm">Details</a>
+                        </th>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock content %}

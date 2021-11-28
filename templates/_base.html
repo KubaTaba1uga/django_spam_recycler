@@ -77,8 +77,7 @@
                     </a>
                     <div class="collapse" id="collapsePages" aria-labelledby="headingTwo" data-bs-parent="#collapsePages">
                         <nav class="sb-sidenav-menu-nested nav">
-                            <a class="nav-link" href="layout-static.html">List All</a>
-                            <a class="nav-link" href="layout-sidenav-light.html">Add New</a>
+                            <a class="nav-link" href="{% url 'reports:report_list_url' %}">List All</a>
                         </nav>
                     </div>                    
                 </div>
@@ -127,8 +126,6 @@
 
   <!-- 3rd party JavaScript -->
   <script src="{% static 'js/scripts.js' %}"></script>
-  <script src="{% static 'assets/demo/chart-area-demo.js' %}"></script>
-  <script src="{% static 'assets/demo/chart-bar-demo.js' %}"></script>
   <script src="{% static 'js/datatables-simple-demo.js' %}"></script>
 
   <!-- Project JS -->
