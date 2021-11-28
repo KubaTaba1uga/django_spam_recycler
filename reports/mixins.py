@@ -52,12 +52,18 @@ class ValidateMailboxImapMixin(FormMixin):
         return form_data
 
     def form_valid(self, form):
-        if validate_credentials(
-            server_address=self.email_server_address,
-            email_address=self.email_address,
-                password=self.email_password):
+        mailbox_credentials = {
+            'server_address': self.email_server_address,
+            'email_address': self.email_address,
+            'password': self.email_password}
 
-            return super().form_valid(form)
+        if validate_credentials(
+                **mailbox_credentials):
+            """
+                If mailbox is valid, render report
+                generation form with valid data
+            """
+            return self.success_view().render_site(self.request, **mailbox_credentials)
 
         form.add_error(None, 'Mailbox validation failed')
 
