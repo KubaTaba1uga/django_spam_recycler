@@ -11,12 +11,12 @@ class ReportListView(ShowOwnerReportsListMixin, ShowGuestReportsListMixin, gener
     template_name = 'reports/report_list_template.html'
 
 
-class ReportCreateView(generic.TemplateView):
+class ReportCreateView(generic.View):
     template_name = 'reports/report_create_template.html'
 
     def render_site(
             self, request, email_address, server_address, password):
-        """ Render site without redirection to other url
+        """ Render site without redirection to the other url
         """
         folder_list = get_mailbox_folder_list(
             server_address, email_address, password)
@@ -27,13 +27,11 @@ class ReportCreateView(generic.TemplateView):
                 {'email_address': email_address,
                  'server_address': server_address,
                  'password': password},
-            'form': ReportGenerateForm()
+                 'form': ReportGenerateForm()
         })
 
 
 class MailboxValidateView(ValidateMailboxOwnerMixin, ValidateMailboxImapMixin, PassLoggedUserToFormMixin, generic.FormView):
     template_name = 'reports/mailbox_validate_template.html'
     form_class = MailboxValidateForm
-    # success_url = reverse_lazy('reports:report_validate_mailbox_url')
-
     success_view = ReportCreateView
