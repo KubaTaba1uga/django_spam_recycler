@@ -12,12 +12,14 @@ from .mixins import (
     MailboxOwnerAndGuestOnlyMixin,
     ShowMailboxGuestsMixin,
     GuestMailboxOwnerOnlyMixin)
-from .forms import MailboxCreateForm, MailboxUpdateForm, MailboxAddGuestForm
+from .forms import (
+    MailboxCreateForm,
+     MailboxUpdateForm,
+     MailboxAddGuestForm)
 
 
-class MailboxListView(LoginRequiredMixin, ShowOwnerMailboxListMixin, ShowGuestMailboxListMixin, generic.ListView):
+class MailboxListView(LoginRequiredMixin, ShowOwnerMailboxListMixin, ShowGuestMailboxListMixin, generic.TemplateView):
     template_name = 'mailboxes/mailbox_list_template.html'
-    model = MailboxModel
 
 
 class MailboxCreateView(LoginRequiredMixin, AddMailboxOwnerMixin, ValidateMailboxImapMixin, generic.CreateView):
@@ -64,6 +66,6 @@ class MailboxGuestDeleteView(LoginRequiredMixin, GuestMailboxOwnerOnlyMixin, gen
     success_url = reverse_lazy('mailboxes:mailbox_list_url')
 
     def get_success_url(self):
-        """Overwrite success url to redirect to mailbox details view
+        """ Overwrite success url to redirect to mailbox details view
         """
         return reverse_lazy('mailboxes:mailbox_details_url', kwargs={'pk': self.object.mailbox.pk})

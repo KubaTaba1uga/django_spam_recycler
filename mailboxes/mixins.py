@@ -132,8 +132,8 @@ class GuestMailboxOwnerOnlyMixin:
 
 class ShowMailboxGuestsMixin:
 
-        def get_context_data(self, **kwargs):
-            context = super().get_context_data(**kwargs)
-            context['mailbox_guests'] = get_guest_mailbox(
-                self.kwargs.get('pk', 0))
-            return context
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['mailbox_guests'] = get_guest_mailbox(
+            self.kwargs.get('pk', 0))
+        return context

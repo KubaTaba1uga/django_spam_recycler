@@ -5,22 +5,25 @@ from mailboxes.models import MailboxModel
 class ReportModel(models.Model):
     name = models.CharField(max_length=32)
     overall = models.IntegerField(default=0)
-    """Score that indicate, mailbox spam vulnerability
+    """ Score that indicate, mailbox spam vulnerability
     """
-    mailbox = models.ForeignKey(MailboxModel, on_delete=models.CASCADE)
-    """Mailbox to which report relate to
+    mailbox = models.ForeignKey(
+        MailboxModel,
+        on_delete=models.CASCADE,
+     related_name='report')
+    """ Mailbox to which report relate to
     """
     created_at = models.DateTimeField(auto_now_add=True)
     """ When report was generated
     """
     start_at = models.DateTimeField()
-    """When search start
+    """ When search start
     """
     end_at = models.DateTimeField()
-    """When search end
+    """ When search end
     """
     messages_counter = models.IntegerField()
-    """How many messages to report
+    """ How many messages to report
     """
 
     def __str__(self):

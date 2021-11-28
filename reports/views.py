@@ -1,8 +1,16 @@
 from django.views import generic
-from .models import ReportModel
+from .mixins import ShowOwnerReportsListMixin, ShowGuestReportsListMixin
+from .forms import MailboxValidateForm
 
 
-class ReportListView(generic.ListView):
+class ReportListView(ShowOwnerReportsListMixin, ShowGuestReportsListMixin, generic.TemplateView):
     template_name = 'reports/report_list_template.html'
-    model = ReportModel
-    context_object_name = 'report_list'
+
+
+class MailboxValidateView(generic.FormView):
+    template_name = 'mailboxes/mailbox_validate_template.html'
+    form_class = MailboxValidateForm
+
+
+class ReportCreateView(generic.TemplateView):
+    template_name = 'reports/report_create_template.html'

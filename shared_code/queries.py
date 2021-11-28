@@ -55,3 +55,22 @@ def get_guest(guest_id):
     """
 
     return MailboxGuestModel.objects.filter(pk=guest_id).first()
+
+
+def get_user_owner_reports(user):
+    """
+    Return all reports of user owned mailboxes
+    """
+
+    for mailbox in get_user_owner_mailboxes(user):
+        for report in mailbox.report.all():
+            yield report
+
+
+def get_user_guest_reports(user):
+    """
+    Return all reports of user guest mailboxes
+    """
+    for mailbox in get_user_guest_mailboxes(user):
+        for report in mailbox.report.all():
+            yield report

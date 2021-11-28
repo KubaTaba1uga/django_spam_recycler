@@ -1,0 +1,13 @@
+{% extends '_base.html' %}
+
+{% block title %}Create Report{% endblock %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+<h2>New Report</h2>
+  <form method="post">{% csrf_token %}
+    {{ form|crispy }}
+    <button class="btn btn-success ml-2" type="submit">Save</button>
+  </form>
+  {% endblock content %}
