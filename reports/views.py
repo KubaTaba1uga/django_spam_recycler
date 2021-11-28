@@ -4,7 +4,7 @@ from django.urls import reverse_lazy
 from mailboxes.mixins import PassLoggedUserToFormMixin
 from shared_code.imap_sync import get_mailbox_folder_list
 from .mixins import ShowOwnerReportsListMixin, ShowGuestReportsListMixin, ValidateMailboxImapMixin, ValidateMailboxOwnerMixin
-from .forms import MailboxValidateForm
+from .forms import MailboxValidateForm, ReportGenerateForm
 
 
 class ReportListView(ShowOwnerReportsListMixin, ShowGuestReportsListMixin, generic.TemplateView):
@@ -16,12 +16,18 @@ class ReportCreateView(generic.TemplateView):
 
     def render_site(
             self, request, email_address, server_address, password):
-        """ Render site without redirect to new url
+        """ Render site without redirection to other url
         """
         folder_list = get_mailbox_folder_list(
             server_address, email_address, password)
+
         return render(request, self.template_name, context={
-            'folder_list': (folder.name for folder in folder_list)
+            'folder_list': (folder.name for folder in folder_list),
+            'mailbox':
+                {'email_address': email_address,
+                 'server_address': server_address,
+                 'password': password},
+            'form': ReportGenerateForm()
         })
 
 
