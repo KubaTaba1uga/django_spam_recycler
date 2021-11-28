@@ -13,10 +13,13 @@ class MailboxValidateForm(PasswordForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
         super().__init__(*args, **kwargs)
-        self.fields['server_address'].widget = forms.HiddenInput()
         self.fields['email_address'] = forms.ChoiceField(
             choices=get_user_owner_mailboxes_tuples(self.user), required=True)
 
+    def form_valid(self, form):
+
+        return super().form_valid(form)
+
     class Meta:
         model = MailboxModel
-        exclude = ['owner', 'guests']
+        exclude = ['owner', 'guests', 'server_address']

@@ -44,16 +44,16 @@ class ValidateMailboxImapMixin(FormMixin):
     """
 
     def form_valid(self, form):
-        if not validate_credentials(
+        if validate_credentials(
             server_address=form.data.get('server_address'),
             email_address=form.data.get('email_address'),
                 password=form.data.get('password')):
 
-            form.add_error(None, 'Mailbox validation failed')
+            return super().form_valid(form)
 
-            return super().form_invalid(form)
+        form.add_error(None, 'Mailbox validation failed')
 
-        return super().form_valid(form)
+        return super().form_invalid(form)
 
 
 class AddMailboxOwnerMixin(FormMixin):
