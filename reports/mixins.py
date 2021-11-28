@@ -1,5 +1,6 @@
 from django.views.generic.edit import FormMixin
-from shared_code.queries import get_user_owner_reports, get_user_guest_reports, get_mailbox_query
+from django.core.exceptions import PermissionDenied
+from shared_code.queries import get_user_owner_reports, get_user_guest_reports, get_mailbox_query, get_mailbox_owner
 from shared_code.imap_sync import validate_credentials
 
 
@@ -61,3 +62,14 @@ class ValidateMailboxImapMixin(FormMixin):
         form.add_error(None, 'Mailbox validation failed')
 
         return super().form_invalid(form)
+
+
+class ValidateMailboxOwnerMixin(FormMixin):
+
+    def form_valid(self, form):
+        mailbox_id = form.data.get('email_address', 0)
+
+        if not get_mailbox_owner(mailbox_id) == self.request.user:
+            raise PermissionDenied('You are not owner of this mailbox')
+
+        return super().form_valid(form)
