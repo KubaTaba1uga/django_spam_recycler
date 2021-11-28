@@ -6,8 +6,14 @@
 
 {% block content %}
 <h2>New Report</h2>
-  <form method="post">{% csrf_token %}
-    {{ form|crispy }}
-    <button class="btn btn-success ml-2" type="submit">Save</button>
-  </form>
+<h4>Mailbox Folders</h4>
+<div>
+  {% csrf_token %}
+  {% for folder in folder_list %}
+    <div>
+      <input type="checkbox" id="{{folder}}" name="folder" value="{{folder}}">
+      <label for="{{folder}}">{{folder}}</label>
+    </div>
+  {% endfor %}
+</div>
 {% endblock content %}

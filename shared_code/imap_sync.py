@@ -20,11 +20,11 @@ def validate_credentials(server_address, email_address, password):
     try:
         return MailBox(server_address).login(email_address, password)
     except Exception as e:
-        logging.warning(f"Validate creadentials failed {e}\n email address: {email_address}\n server address {server_address}")
-    """ Because exceptions types thrown by `imap_tools` are too much,
+        logging.warning(f"Validate creadentials failed - {e}\n email address: {email_address}\n server address {server_address}")
+    """ Because exceptions types thrown by `imap_tools` are not predictible,
             `Exception` is used
 
-        Example of code before:
+        Code before:
             except ConnectionRefusedError:
                 pass
              except IMAP4.error:
@@ -33,3 +33,8 @@ def validate_credentials(server_address, email_address, password):
                 pass
     """
     return False
+
+
+def get_mailbox_folder_list(server_address, email_address, password):
+    return MailBox(server_address).login(
+        email_address, password).folder.list()
