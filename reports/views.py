@@ -13,6 +13,7 @@ class ReportListView(ShowOwnerReportsListMixin, ShowGuestReportsListMixin, gener
 
 class ReportCreateView(generic.View):
     template_name = 'reports/report_create_template.html'
+    http_method_names = ['post']
 
     def render_site(
             self, request, email_address, server_address, password):
@@ -29,6 +30,11 @@ class ReportCreateView(generic.View):
                  'password': password},
                  'form': ReportGenerateForm()
         })
+
+    # def post(self, request, *args, **kwargs):
+    #     report_form = ReportGenerateForm(request.POST)
+
+    #     if report_form.is_valid():
 
 
 class MailboxValidateView(ValidateMailboxOwnerMixin, ValidateMailboxImapMixin, PassLoggedUserToFormMixin, generic.FormView):

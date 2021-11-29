@@ -13,18 +13,16 @@
   <div class='row'>
       <h4 class="mt-3">Mailbox</h4>
       <dl class='row'>
-      {% comment %}
-      
-      TO-DO
-        Change col-sm-9 to disabled input  
-      
-      {% endcomment %}
-          <dt class="col-sm-3">Email Address</dt>
-          <dd class="col-sm-9">{{ mailbox.email_address }}</dd>
-          <dt class="col-sm-3">Server Address</dt>
-          <dd class="col-sm-9">{{ mailbox.server_address }}</dd>
-          <dt class="col-sm-3">Password</dt>
-          <dd class="col-sm-9">{{ mailbox.password }}</dd>
+        <dt class="col-sm-2">Email Address</dt>
+        <dd class="col-sm-5"><input type="text" id="email_address" name="email_address" class="textInput form-control" value="{{ mailbox.email_address }}" disabled></dd><br>
+      </dl>   
+      <dl class='row'>
+        <dt class="col-sm-2">Server Address</dt>
+        <dd class="col-sm-5"><input type="text" id="server_address" name="server_address" class="textInput form-control"  value="{{ mailbox.server_address }}" disabled></dd>
+      </dl>   
+      <dl class='row'>
+        <dt class="col-sm-2">Password</dt>
+        <dd class="col-sm-5"><input type="text" id="password" name="password" class="textInput form-control"  value="{{ mailbox.password }}" disabled></dd>
       </dl>
     </div>
   </div>
