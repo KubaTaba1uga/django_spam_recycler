@@ -29,7 +29,7 @@ class MailboxValidateForm(PasswordForm):
 
 class ReportGenerateForm(forms.ModelForm):
 
-    def is_valid(self) -> bool:
+    def is_valid(self, user) -> bool:
         if super().is_valid():
             form = {
                 field.name: field.value()

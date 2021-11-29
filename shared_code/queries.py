@@ -1,4 +1,6 @@
+import logging
 from mailboxes.models import MailboxModel, MailboxGuestModel
+from reports.models import ReportModel
 
 
 def get_user_guest_mailboxes(user):
@@ -81,3 +83,20 @@ def get_user_guest_reports(user):
     for mailbox in get_user_guest_mailboxes(user):
         for report in mailbox.report.all():
             yield report
+
+
+def get_mailbox_by_owner(email_address, user):
+    return MailboxModel.objects.filter(email_address=email_address, owner=user).first()
+
+
+def create_report(name, mailbox, user, start_at, end_at):
+    try:
+        return ReportModel.objects.create(
+            name=name,
+            mailbox=mailbox,
+            start_at=start_at,
+            end_at=end_at,
+            messages_counter=0)
+    except Exception as e:
+        logging.error(f'Failed to create report: {e}')
+        return False
