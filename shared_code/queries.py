@@ -1,4 +1,6 @@
+import logging
 from mailboxes.models import MailboxModel, MailboxGuestModel
+from reports.models import ReportModel
 
 
 def get_user_guest_mailboxes(user):
@@ -17,6 +19,13 @@ def get_user_owner_mailboxes(user):
     Return owned mailboxes of a user.
     """
     return (owned_mailbox for owned_mailbox in get_user_owner_mailboxes_query(user))
+
+
+def get_user_owner_mailboxes_tuples(user):
+    """
+    Return owned mailboxes of a user as tuple
+    """
+    return ((owned_mailbox.id, owned_mailbox.email_address) for owned_mailbox in get_user_owner_mailboxes_query(user))
 
 
 def get_mailbox_query(mailbox_id):
@@ -55,3 +64,39 @@ def get_guest(guest_id):
     """
 
     return MailboxGuestModel.objects.filter(pk=guest_id).first()
+
+
+def get_user_owner_reports(user):
+    """
+    Return all reports of user owned mailboxes
+    """
+
+    for mailbox in get_user_owner_mailboxes(user):
+        for report in mailbox.report.all():
+            yield report
+
+
+def get_user_guest_reports(user):
+    """
+    Return all reports of user guest mailboxes
+    """
+    for mailbox in get_user_guest_mailboxes(user):
+        for report in mailbox.report.all():
+            yield report
+
+
+def get_mailbox_by_owner(email_address, user):
+    return MailboxModel.objects.filter(email_address=email_address, owner=user).first()
+
+
+def create_report(name, mailbox, user, start_at, end_at):
+    try:
+        return ReportModel.objects.create(
+            name=name,
+            mailbox=mailbox,
+            start_at=start_at,
+            end_at=end_at,
+            messages_counter=0)
+    except Exception as e:
+        logging.error(f'Failed to create report: {e}')
+        return False

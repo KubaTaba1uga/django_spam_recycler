@@ -1,0 +1,50 @@
+{% extends '_base.html' %}
+
+{% block title %}Create Report{% endblock %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+<h2 class='d-inline-block'>New Report</h2>
+<div class='container'>
+  <form method="post" action={% url 'reports:report_create_url' %}>
+   
+          
+  <div class='row'>
+      <h4 class="mt-3">Mailbox</h4>
+      <dl class='row'>
+        <dt class="col-sm-2">Email Address</dt>
+        <dd class="col-sm-5"><input type="text" name="email_address" id="email_address"  class="textInput form-control" value="{{ mailbox.email_address }}" readonly ></dd><br>
+      </dl>   
+      <dl class='row'>
+        <dt class="col-sm-2">Server Address</dt>
+        <dd class="col-sm-5"><input type="text" id="server_address" name="server_address" class="textInput form-control"  value="{{ mailbox.server_address }}" readonly></dd>
+      </dl>   
+      <dd class="col-sm-5"><input type="text" id="password" name="password" class="textInput form-control"  value="{{ mailbox.password }}" readonly hidden></dd>
+  </div>
+  
+  <div class='row'>
+    <div class="col-sm-5 col-6">
+      <div class="container">
+        <h4>Report Details</h4>
+          {% csrf_token %}
+            {{ form|crispy }}
+            <button class="btn btn-success ml-2" type="submit">Generate</button>
+      </div>
+    </div>
+    <div class="col-sm-4 col-6">
+      <h4>Mailbox Folders</h4>
+      <div>
+        {% for folder in folder_list %}
+          <div>
+            <input type="checkbox" id="{{folder}}" name="folder" value="{{folder}}">
+            <label for="{{folder}}">{{folder}}</label>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  </form>
+</div>
+
+{% endblock content %}
