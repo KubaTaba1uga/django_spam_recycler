@@ -21,7 +21,17 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 # load tasks.py in django apps
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
+# create queue if is not exsisting
+app.conf.task_create_missing_queues = True
+
 
 @app.task(bind=True)
 def debug_task(self):
     print(f'Request: {self.request!r}')
+
+""" Start flower
+        $  celery --broker=amqp://myuser:mypassword@localhost:5672/myvhost flower --port=5000
+    Start worker
+        $  celery -A config worker -l info
+
+"""

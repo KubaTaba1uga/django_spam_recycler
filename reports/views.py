@@ -7,7 +7,7 @@ from shared_code.imap_sync import get_mailbox_folder_list, validate_credentials,
 from shared_code.queries import get_mailbox_by_owner, create_report
 from .mixins import ShowOwnerReportsListMixin, ShowGuestReportsListMixin, ValidateMailboxImapMixin, ValidateMailboxOwnerMixin
 from .forms import MailboxValidateForm, ReportGenerateForm
-from config.celery import debug_task
+from .tasks import create_user_queues
 
 
 class ReportListView(ShowOwnerReportsListMixin, ShowGuestReportsListMixin, generic.TemplateView):
@@ -73,9 +73,11 @@ class ReportCreateView(generic.View):
                                 report_form.cleaned_data['start_at'],
                                 report_form.cleaned_data['end_at'])
 
-                            if report:
+                            if True or report:
                                 """ Start report evaluation
                                 """
+
+                                create_user_queues(request.user.id)
 
                             else:
                                 report_form.add_error(
