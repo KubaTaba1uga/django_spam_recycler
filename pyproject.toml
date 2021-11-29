@@ -8,7 +8,6 @@ authors = ["KubaTaba1uga <jakub@buczynski.net.pl>"]
 python = "^3.9"
 Django = "3.1.4"
 aiospamc = "^0.7.1"
-redis = "^4.0.2"
 celery = "^5.2.1"
 aioimaplib = "^0.9.0"
 whitenoise = "5.2.0"

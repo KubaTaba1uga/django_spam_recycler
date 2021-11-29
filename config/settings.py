@@ -177,3 +177,8 @@ ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
+
+# Celery rabbitMQ
+# ------------------------------------------------------------------------------
+# https://docs.celeryproject.org/en/latest/getting-started/backends-and-brokers/rabbitmq.html#setting-up-rabbitmq
+CELERY_BROKER_URL = 'amqp://myuser:mypassword@localhost:5672/myvhost'

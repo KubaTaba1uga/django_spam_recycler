@@ -7,10 +7,15 @@ from shared_code.imap_sync import get_mailbox_folder_list, validate_credentials,
 from shared_code.queries import get_mailbox_by_owner, create_report
 from .mixins import ShowOwnerReportsListMixin, ShowGuestReportsListMixin, ValidateMailboxImapMixin, ValidateMailboxOwnerMixin
 from .forms import MailboxValidateForm, ReportGenerateForm
+from config.celery import debug_task
 
 
 class ReportListView(ShowOwnerReportsListMixin, ShowGuestReportsListMixin, generic.TemplateView):
     template_name = 'reports/report_list_template.html'
+
+    def get(self, request, *args, **kwargs):
+        debug_task.delay()
+        return super().get(request, *args, **kwargs)
 
 
 class ReportCreateView(generic.View):
