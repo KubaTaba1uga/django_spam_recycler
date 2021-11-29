@@ -1,3 +1,4 @@
+from django.http.response import HttpResponse
 from django.shortcuts import render
 from django.views import generic
 from django.urls import reverse_lazy
@@ -31,10 +32,14 @@ class ReportCreateView(generic.View):
                  'form': ReportGenerateForm()
         })
 
-    # def post(self, request, *args, **kwargs):
-    #     report_form = ReportGenerateForm(request.POST)
+    def post(self, request, *args, **kwargs):
+        report_form = ReportGenerateForm(request.POST)
+        print(request.POST)
 
-    #     if report_form.is_valid():
+        if report_form.is_valid():
+            print('valid')
+
+        return HttpResponse('OK')  # self.render_site()
 
 
 class MailboxValidateView(ValidateMailboxOwnerMixin, ValidateMailboxImapMixin, PassLoggedUserToFormMixin, generic.FormView):
