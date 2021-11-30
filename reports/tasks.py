@@ -1,4 +1,5 @@
 from shared_code.rabbit_mq import create_rabbit_mq_queue_with_worker, is_queue_created
+from shared_code.celery import create_detached_worker
 
 
 def create_user_download_emails(user_id):
@@ -39,5 +40,7 @@ def create_user_queues(user_id):
     """
     Create a queue for each user
     """
+    # create_detached_worker.delay(user_id)
+    # create_detached_worker(user_id)
     create_user_download_emails(user_id)
     create_user_evaluate_spam(user_id)

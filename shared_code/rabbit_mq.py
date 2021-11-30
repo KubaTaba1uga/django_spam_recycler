@@ -1,16 +1,27 @@
 from config.celery import app
-import celery
+from celery.bin.worker import detach
+from celery.platforms import detached, create_pidlock
 
 
-def create_rabbit_mq_queue_with_worker(queue_name):
+def create_worker(queue_name):
     """
     Create a queue with a worker
     """
-    worker = app.Worker(
-        hostname=queue_name
-    )
-    app.control.add_consumer(queue_name,
-                             destination=[queue_name])
+
+    with detached(logfile=f'/var/run/celery/{queue_name}.log',
+                  pidfile=f'/var/run/celery/{queue_name}.pid',
+                  uid='root'):
+
+        pidlock = create_pidlock(f'/var/run/celery/{queue_name}.pid')
+
+        worker = app.Worker(
+            hostname=queue_name,
+        )
+
+        app.control.add_consumer(queue_name,
+                                 destination=['celery@' + queue_name])
+
+        worker.start()
 
 
 def generate_queue_list():
