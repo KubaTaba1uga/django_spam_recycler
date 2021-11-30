@@ -13,10 +13,6 @@ from .tasks import create_user_queues
 class ReportListView(ShowOwnerReportsListMixin, ShowGuestReportsListMixin, generic.TemplateView):
     template_name = 'reports/report_list_template.html'
 
-    def get(self, request, *args, **kwargs):
-        debug_task.delay()
-        return super().get(request, *args, **kwargs)
-
 
 class ReportCreateView(generic.View):
     template_name = 'reports/report_create_template.html'

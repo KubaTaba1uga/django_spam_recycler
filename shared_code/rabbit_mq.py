@@ -1,9 +1,8 @@
 from config.celery import app
-from celery.bin.worker import detach
 from celery.platforms import detached, create_pidlock
 
 
-def create_worker(queue_name):
+def create_detached_worker(queue_name):
     """
     Create a queue with a worker
     """
@@ -12,7 +11,7 @@ def create_worker(queue_name):
                   pidfile=f'/var/run/celery/{queue_name}.pid',
                   uid='root'):
 
-        pidlock = create_pidlock(f'/var/run/celery/{queue_name}.pid')
+        create_pidlock(f'/var/run/celery/{queue_name}.pid')
 
         worker = app.Worker(
             hostname=queue_name,
