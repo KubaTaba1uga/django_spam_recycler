@@ -25,9 +25,13 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 app.conf.task_create_missing_queues = True
 
 
-@app.task(bind=True)
+from time import sleep
+
+
+@app.task(bind=True, )
 def debug_task(self):
-    print(f'Request: {self.request!r}')
+    sleep(10)
+    print(f'DONE')
 
 """ Start flower
         $  celery --broker=amqp://myuser:mypassword@localhost:5672/myvhost flower --port=5000

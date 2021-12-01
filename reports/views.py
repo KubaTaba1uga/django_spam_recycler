@@ -101,3 +101,13 @@ class MailboxValidateView(ValidateMailboxOwnerMixin, ValidateMailboxImapMixin, P
     template_name = 'reports/mailbox_validate_template.html'
     form_class = MailboxValidateForm
     success_view = ReportCreateView
+
+from config.celery import debug_task
+
+
+class TestRabbitMqView(generic.View):
+
+    def get(self, request, *args, **kwargs):
+        for i in range(30):
+            debug_task.delay()
+        return HttpResponse('OK')
