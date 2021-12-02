@@ -28,7 +28,7 @@ app.conf.task_create_missing_queues = True
 from time import sleep
 
 
-@app.task(bind=True, )
+@app.task(bind=True)
 def debug_task(self):
     sleep(10)
     print(f'DONE')

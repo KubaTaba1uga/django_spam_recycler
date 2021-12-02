@@ -1,7 +1,11 @@
 import sys
-import logging
 from subprocess import Popen, PIPE, CalledProcessError
 import json
+
+PIDFILES_FOLDER = '/home/taba1uga/celery_workers/'
+""" Store pidfiles on disk to avoid multiple
+        workers for the same user
+"""
 
 
 def unpack_json(json_string):
@@ -66,16 +70,12 @@ def create_worker(worker_name):
     Creates a worker on the celery
     """
 
-    COMMAND = f'celery -A config worker -n {worker_name} -c 1 --detach'
+    COMMAND = f'celery -A config worker -n {worker_name} -c 1 --detach --pidfile {PIDFILES_FOLDER}{worker_name}.pid'
 
-    worker_celery_name = create_worker_celery_name(worker_name)
+    worker_creation = execute_command(COMMAND)
 
-    if not does_worker_exist(worker_celery_name):
-
-        worker_creation = execute_command(COMMAND)
-
-        if worker_creation.wait() != 0:
-            raise CalledProcessError
+    if worker_creation.wait() != 0:
+        raise CalledProcessError
 
 
 def unconsume_queue_by_worker(worker_name, queue_name):
@@ -110,14 +110,11 @@ def main(worker_name, spam_queue_name):
     """
 
     worker_celery_name = create_worker_celery_name(worker_name)
+    create_worker(worker_name)
 
     if not does_worker_exist(worker_celery_name):
 
-        create_worker(worker_name)
-
-    else:
-
-        logging.info(f'Worker {worker_name} already exists')
+        main(worker_name, spam_queue_name)
 
     for queue in get_worker_queues(worker_name):
         """
@@ -125,12 +122,9 @@ def main(worker_name, spam_queue_name):
         """
         if queue['name'] != spam_queue_name:
 
-            logging.info(f'Unconsuming queue {queue["name"]}')
-
             unconsume_queue_by_worker(worker_celery_name, queue['name'])
 
         else:
-            logging.info(f'{worker_name} is already consuming {queue["name"]}')
             return
     """
     Add spam_queue only if it is not already being consumed

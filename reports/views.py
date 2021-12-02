@@ -7,7 +7,6 @@ from shared_code.imap_sync import get_mailbox_folder_list, validate_credentials,
 from shared_code.queries import get_mailbox_by_owner, create_report
 from .mixins import ShowOwnerReportsListMixin, ShowGuestReportsListMixin, ValidateMailboxImapMixin, ValidateMailboxOwnerMixin
 from .forms import MailboxValidateForm, ReportGenerateForm
-from .tasks import create_user_queues
 
 
 class ReportListView(ShowOwnerReportsListMixin, ShowGuestReportsListMixin, generic.TemplateView):
@@ -73,8 +72,6 @@ class ReportCreateView(generic.View):
                                 """ Start report evaluation
                                 """
 
-                                create_user_queues(request.user.id)
-
                             else:
                                 report_form.add_error(
                                     None,
@@ -103,11 +100,13 @@ class MailboxValidateView(ValidateMailboxOwnerMixin, ValidateMailboxImapMixin, P
     success_view = ReportCreateView
 
 from config.celery import debug_task
+from .tasks import create_user_spam_queue
 
 
 class TestRabbitMqView(generic.View):
 
     def get(self, request, *args, **kwargs):
+        queue = create_user_spam_queue(request.user.id)
         for i in range(30):
-            debug_task.delay()
+            debug_task.apply_async(queue=queue)
         return HttpResponse('OK')
