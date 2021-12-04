@@ -1,11 +1,11 @@
 from django.http.response import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.views import generic
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from mailboxes.mixins import PassLoggedUserToFormMixin
 from shared_code.imap_sync import get_mailbox_folder_list, validate_credentials, validate_folder_list
-from shared_code.queries import get_mailbox_by_owner, get_report_by_mailbox_and_name
+from shared_code.queries import create_report, get_mailbox_by_owner, get_report_by_mailbox_and_name
 from .mixins import ShowOwnerReportsListMixin, ShowGuestReportsListMixin, ValidateMailboxImapMixin, ValidateMailboxOwnerMixin
 from .forms import MailboxValidateForm, ReportGenerateForm
 from .tasks import generate_report_task
@@ -75,15 +75,21 @@ class ReportCreateView(LoginRequiredMixin, generic.View):
                                 """ Generate report
                                 """
 
+                                report = create_report(
+                                    request.POST[
+                                        'name'], db_mailbox.id, request.POST['start_at'],
+                                                      request.POST['end_at'])
+
                                 generate_report_task.delay(
                                     request.user.id,
                                     selected_folder_list,
                                     request.POST['start_at'],
                                     request.POST['end_at'],
                                     mailbox_credentials,
-                                    request.POST['name'],
-                                    db_mailbox.id
+                                    report.id
                                 )
+
+                                return redirect(reverse_lazy('reports:report_show_status_url', args=[report.id]))
 
                             else:
                                 report_form.add_error(
@@ -111,3 +117,12 @@ class MailboxValidateView(ValidateMailboxOwnerMixin, ValidateMailboxImapMixin, P
     template_name = 'reports/mailbox_validate_template.html'
     form_class = MailboxValidateForm
     success_view = ReportCreateView
+
+
+class ReportShowStatusView(generic.TemplateView):
+    template_name = 'reports/report_show_status_template.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ReportShowStatusView, self).get_context_data(**kwargs)
+        context['report_id'] = kwargs.get('pk')
+        return context

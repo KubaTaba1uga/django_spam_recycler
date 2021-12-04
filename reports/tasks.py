@@ -55,22 +55,13 @@ def download_email_task(email_guid, mailbox_credentials, folder, report_id):
 
 @shared_task
 def generate_report_task(
-        user_id, folder_list, start_date, end_date, mailbox_credentials, report_name, mailbox_id):
+        user_id, folder_list, start_date, end_date, mailbox_credentials, report_id):
     """
     Generate spam evaluation report for user with user_id
 
     Set up worker and queue for email downloading
     Set up worker and queue for spam evaluation
 
-
-    :param user_id: int
-    :param folder_list: list
-    :param start_date: str
-    :param end_date: str
-    :param email_address: str
-    :param server_address: str
-    :param password: str
-    :return :str
     """
 
     email_queue = create_user_email_queue(user_id)
@@ -78,17 +69,11 @@ def generate_report_task(
 
     search = create_search_from_str(start_date, end_date)
 
-    report = create_report(
-        name=report_name,
-        start_at=start_date,
-        end_at=end_date,
-        mailbox_id=mailbox_id)
-
     for folder in folder_list:
         for email_guid in gather_emails_GUIDs(mailbox_credentials=mailbox_credentials, folder=folder, search=search):
             download_email_task.apply_async(
                 args=[email_guid,
-                      mailbox_credentials, folder, report.id],
+                      mailbox_credentials, folder, report_id],
                 queue=email_queue)
 
     return "Report for user {} has been generated".format(user_id)

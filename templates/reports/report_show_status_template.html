@@ -1,0 +1,55 @@
+{% extends '_base.html' %}
+
+{% block title %}Report Status{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-5 mt-5">
+        <div class="col-md-4 col-sm-6">
+            <div class="counter">
+                <div class="counter-content">
+                    <div class="counter-icon">
+                        <i class="fa fa-envelope"></i>
+                    </div>
+                    <br>
+                    <h3>All messagess</h3>
+                    <h2 class="counter-value" id="all_messagess_counter"></h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-6">
+            <div class="counter orange">
+                <div class="counter-content">
+                    <div class="counter-icon">
+                        <i class="fa fa-envelope-open"></i>
+                    </div>
+                    <h3>Messagess Downloaded</h3>
+                    <h2 class="counter-value" id="downloaded_messagess_counter"></h2>
+                </div>
+            </div>
+        </div>
+         <div class="col-md-4 col-sm-6">
+            <div class="counter green">
+                <div class="counter-content">
+                    <div class="counter-icon">
+                        <i class="fa fa-envelope-open-text"></i>
+                    </div>
+                    <h3>Messagess Evaluated</h3>
+                    <h2 class="counter-value"  id="evaluated_messagess_counter"></h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="counter-messages" hidden>1</div>
+ <div id="myProgress" class="progress">
+  <div id="myBar" class="progress-bar progress-bar-striped active" role="progressbar">
+  </div>
+</div> 
+ <div class="col-xs-1 text-center mt-5" id="ready_sign" hidden>
+    {% comment %} <a href="{% url 'reports:report_ready_url' report_id %} "><button class="bn632-hover bn22">Ready!</button></a> {% endcomment %}
+</div>
+{% load static %} 
+<script src="{% static 'js/report_show_status.js' %}"></script>
+<link rel="stylesheet" href="{% static 'css/report_show_status.css' %}">
+{% endblock content %}

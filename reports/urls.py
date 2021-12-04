@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import MailboxValidateView, ReportListView, ReportCreateView
+from .views import MailboxValidateView, ReportListView, ReportCreateView, ReportShowStatusView
 
 urlpatterns = [
     path('list', ReportListView.as_view(), name='report_list_url'),
@@ -9,5 +9,7 @@ urlpatterns = [
         'validate_mailbox',
         MailboxValidateView.as_view(),
      name='report_validate_mailbox_url'),
-
+     path('<int:pk>/show_status',
+          ReportShowStatusView.as_view(),
+          name='report_show_status_url'),
 ]
