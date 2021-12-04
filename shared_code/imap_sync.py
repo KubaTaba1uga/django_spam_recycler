@@ -3,7 +3,7 @@ from imap_tools import MailBox
 import logging
 
 
-def validate_credentials(server_address, email_address, password):
+def validate_credentials(email_address, server_address, password):
     """Validate IMAP credentials.
         If IMAP validation succeed
          return True
@@ -14,7 +14,7 @@ def validate_credentials(server_address, email_address, password):
         password (str): [password which app should validate]
 
     Returns:
-        [bool]: [True if credentials are valid,
+        [MailBox/bool]: [MailBox if credentials are valid,
                   False if credentials are not valid]
     """
 
@@ -36,9 +36,16 @@ def validate_credentials(server_address, email_address, password):
     return False
 
 
-def get_mailbox_folder_list(server_address, email_address, password):
+def create_mailbox(email_address, server_address, password):
     return MailBox(server_address).login(
-        email_address, password).folder.list()
+        email_address, password)
+
+
+def get_mailbox_folder_list(email_address, server_address, password):
+    mailbox = create_mailbox(email_address, server_address, password)
+    folder_list = mailbox.folder.list()
+    mailbox.logout()
+    return folder_list
 
 
 def validate_folder(mailbox, folder):

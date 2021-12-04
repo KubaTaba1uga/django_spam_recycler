@@ -2,7 +2,7 @@ from random import randint
 from socket import gaierror
 from celery import shared_task, Task
 from shared_code.worker_utils import create_user_email_queue, create_user_spam_queue
-
+from shared_code.imap_sync import create_mailbox
 """
     Shedule periodic task to check if user has reports to generate
     If not kill user spam and email workers
@@ -23,16 +23,33 @@ class BaseTaskWithRetry(Task):
     retry_jitter = True
 
 
+def gather_emails_GUIDs(mailbox, search):
+    """ Download GUID of messages passing search requirements
+    """
+    return (email for email in mailbox.uids(search))
+
+
 @shared_task
 def generate_report_task(
-        user_id, folder_list, email_address, server_address, password):
+        user_id, folder_list, start_date, end_date, mailbox_credentials):
     """
     Generate spam evaluation report for user with user_id
-    :param user_id:
-    :return:
+    :param user_id: int
+    :param folder_list: list
+    :param start_date: str
+    :param end_date: str
+    :param email_address: str
+    :param server_address: str
+    :param password: str
+    :return :str
     """
 
-    create_user_email_queue(user_id)
-    create_user_spam_queue(user_id)
+    email_queue = create_user_email_queue(user_id)
+    spam_queue = create_user_spam_queue(user_id)
 
+    mailbox = create_mailbox(**mailbox_credentials)
+    return mailbox
+    # for email in gather_emails_GUIDs(mailbox, folder_list):
+    #     pass
+    # return email
     return "Report for user {} has been generated".format(user_id)

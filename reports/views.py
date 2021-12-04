@@ -24,7 +24,7 @@ class ReportCreateView(LoginRequiredMixin, generic.View):
         """ Render site without redirection to the other url
         """
         folder_list = get_mailbox_folder_list(
-            server_address, email_address, password)
+            email_address, server_address, password)
 
         return render(request, self.template_name, context={
             'folder_list': (folder.name for folder in folder_list),
@@ -66,18 +66,17 @@ class ReportCreateView(LoginRequiredMixin, generic.View):
                             Add report validation here
                             """
 
+                            """ Log out imap connection to avoid concurrency errors
+                            """
+                            imap_mailbox.logout()
+
                             generate_report_task.delay(
                                 request.user.id,
                                 selected_folder_list,
-                                **mailbox_credentials
+                                request.POST.get('start_at'),
+                                request.POST.get('end_at'),
+                                mailbox_credentials
                             )
-
-                            # report = create_report(
-                            #     report_form.cleaned_data['name'],
-                            #     db_mailbox,
-                            #     request.user,
-                            #     report_form.cleaned_data['start_at'],
-                            #     report_form.cleaned_data['end_at'])
 
                             if True:
                                 """ Generate report

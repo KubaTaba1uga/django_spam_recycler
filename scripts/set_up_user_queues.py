@@ -2,7 +2,7 @@ import sys
 from subprocess import Popen, PIPE, CalledProcessError
 import json
 
-PIDFILES_FOLDER = '/home/taba1uga/Pulpit/spam_segregator/scripts/pid_locks'
+PIDFILES_FOLDER = '/home/taba1uga/Pulpit/spam_segregator/scripts/pid_locks/'
 """ Store pidfiles on disk to avoid multiple
         workers with the same name
 """
