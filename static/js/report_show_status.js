@@ -1,10 +1,8 @@
-
 const URL = window.location.href.replace('show_status', 'check_status')
 var all_messages = document.querySelector('#all_messagess_counter')
 var downloaded_messages = document.querySelector('#downloaded_messagess_counter')
 var evaluated_messagess = document.querySelector('#evaluated_messagess_counter')
 
-update_counters()
 setInterval(update_counters_if_not_equal, 500)
 
 function update_counters() {

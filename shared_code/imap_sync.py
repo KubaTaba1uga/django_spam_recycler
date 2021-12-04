@@ -156,3 +156,14 @@ def gather_emails_GUIDs(mailbox, search, folder):
 def download_message_by_guid(mailbox, guid):
     for email in mailbox.fetch(AND(uid=[guid])):
         return email
+
+
+def parse_message(message):
+    return {
+        'subject': message.subject,
+        'sender': message.from_values.email,
+        'to_recipients': " ,".join(to.email for to in message.to_values),
+        'received_at': message.date,
+        'body': message.html,
+        'orginal_message': message.obj
+    }

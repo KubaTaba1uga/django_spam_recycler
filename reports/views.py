@@ -10,6 +10,7 @@ from shared_code.queries import (
      count_messages_in_report,
      create_report,
      get_mailbox_by_owner,
+    get_report_by_id_and_owner,
      get_report_by_mailbox_and_name,
      validate_report_owner)
 from .mixins import ShowOwnerReportsListMixin, ShowGuestReportsListMixin, ValidateMailboxImapMixin, ValidateMailboxOwnerMixin, ValidateReportOwnerMixin
@@ -137,7 +138,7 @@ class ReportShowStatusView(ValidateReportOwnerMixin, LoginRequiredMixin, generic
 class ReportCheckStatusView(ValidateReportOwnerMixin, LoginRequiredMixin, generic.View):
 
     def get(self, request, pk, *args, **kwargs):
-        report = validate_report_owner(pk, request.user.id)
+        report = get_report_by_id_and_owner(pk, request.user.id)
 
         response_body = dict()
 

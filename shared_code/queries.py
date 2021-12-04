@@ -99,7 +99,7 @@ def create_report(name, mailbox_id, start_at, end_at):
 
 
 def create_message(subject, sender, to_recipients,
-                   received_at, body, folder, report_id):
+                   received_at, body, orginal_message, folder, report_id):
     return MessageModel.objects.create(
         subject=subject,
         sender=sender,
@@ -107,7 +107,8 @@ def create_message(subject, sender, to_recipients,
         received_at=received_at,
         body=body,
         folder=folder,
-        report_id=report_id)
+        report_id=report_id,
+        orginal_message=orginal_message)
 
 
 def get_report_by_mailbox_and_name(name, mailbox):

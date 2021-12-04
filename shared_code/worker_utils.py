@@ -25,6 +25,6 @@ def create_user_email_queue(user_id):
     """
     Create a queue for each user
     """
-    queue_name = create_user_spam_queue_name(user_id)
+    queue_name = create_user_email_queue_name(user_id)
     execute_command(f'{COMMAND_EXEC} {SCRIPT_PATH} {user_id} email')
     return queue_name
