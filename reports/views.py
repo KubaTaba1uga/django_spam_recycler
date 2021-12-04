@@ -173,10 +173,10 @@ class ReportIsReadyView(ValidateReportOwnerMixin, generic.View):
         if count_messages_in_report(report) == count_messages_evaluations_in_report(report):
             return redirect(reverse_lazy('reports:report_details_url', args=[pk]))
         else:
-            return redirect(reverse_lazy('reports:report_check_progress_url', args=[pk]))
+            return redirect(reverse_lazy('reports:report_show_status_url', args=[pk]))
 
 
-class ReportDetailsView(generic.DetailView):
+class ReportDetailsView(ValidateReportOwnerMixin, generic.DetailView):
     template_name = 'reports/report_details_template.html'
     model = ReportModel
     context_object_name = 'report'
