@@ -48,8 +48,8 @@ def generate_report_task(
     spam_queue = create_user_spam_queue(user_id)
 
     mailbox = create_mailbox(**mailbox_credentials)
-    return mailbox
-    # for email in gather_emails_GUIDs(mailbox, folder_list):
-    #     pass
-    # return email
+
+    for email in gather_emails_GUIDs(mailbox, folder_list):
+        pass
+    return email
     return "Report for user {} has been generated".format(user_id)

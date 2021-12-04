@@ -45,7 +45,10 @@ class ReportCreateView(LoginRequiredMixin, generic.View):
         }
 
         if mailbox_credentials['email_address'] and mailbox_credentials['server_address'] and mailbox_credentials['password']:
-
+            """ If mailbox is valid it return logeed in imap Mailbox instance
+                    Mailbox instance is reused in validate_folder_list function
+                    to shorten HTTP response time
+            """
             imap_mailbox = validate_credentials(**mailbox_credentials)
 
             if imap_mailbox:

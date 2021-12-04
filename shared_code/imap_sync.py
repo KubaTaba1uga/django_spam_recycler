@@ -65,13 +65,6 @@ def create_mailbox(email_address, server_address, password):
         email_address, password)
 
 
-def get_mailbox_folder_list(email_address, server_address, password):
-    mailbox = create_mailbox(email_address, server_address, password)
-    folder_list = mailbox.folder.list()
-    mailbox.logout()
-    return folder_list
-
-
 def validate_folder(mailbox, folder):
     """Chack folder exsistance, inside mailbox
         If folder validation succeed
@@ -108,3 +101,44 @@ def validate_folder_list(folder_list, mailbox, form):
         return True
     else:
         return False
+
+
+def create_mailbox_decorator(func):
+    """ If function use Mailbox object,
+            use decorator to avoid creating MailBox object
+            inside function
+
+        Example:
+            Without decorator
+
+                def get_mailbox_folder_list(email_address, server_address, password):
+                    mailbox = create_mailbox(email_address, server_address, password)
+                    folder_list = mailbox.folder.list()
+                    mailbox.logut()
+                    return folder_list
+
+            With decorator
+
+                @create_mailbox_decorator
+                def get_mailbox_folder_list(mailbox):
+                    return mailbox.folder.list()
+
+
+    """
+    def decorator(email_address, server_address, password, *args, **kwargs):
+
+        mailbox = create_mailbox(email_address, server_address, password)
+
+        result = func(mailbox, *args, **kwargs)
+
+        mailbox.logout()
+
+        return result
+
+    return decorator
+
+
+@create_mailbox_decorator
+def get_mailbox_folder_list(mailbox):
+    folder_list = mailbox.folder.list()
+    return folder_list
