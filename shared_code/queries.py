@@ -1,6 +1,6 @@
 import logging
 from mailboxes.models import MailboxModel, MailboxGuestModel
-from reports.models import ReportModel, MessageModel
+from reports.models import ReportModel, MessageModel, MessageEvaluationModel
 
 
 def get_user_guest_mailboxes(user):
@@ -112,3 +112,21 @@ def create_message(subject, sender, to_recipients,
 
 def get_report_by_mailbox_and_name(name, mailbox):
     return ReportModel.objects.filter(name=name, mailbox=mailbox).first()
+
+
+def count_messages_in_report(report):
+    return MessageModel.objects.filter(
+        report=report).count()
+
+
+def count_messages_evaluations_in_report(report):
+    return MessageEvaluationModel.objects.filter(
+        message__report=report).count()
+
+
+def get_report_by_id_and_owner(report_id, user_id):
+    return ReportModel.objects.filter(pk=report_id, mailbox__owner_id=user_id).first()
+
+
+def validate_report_owner(report_id, user_id):
+    return get_report_by_id_and_owner(report_id, user_id)

@@ -1,5 +1,5 @@
 
-const URL = window.location.href.replace('check_progress', 'check_status')
+const URL = window.location.href.replace('show_status', 'check_status')
 var all_messages = document.querySelector('#all_messagess_counter')
 var downloaded_messages = document.querySelector('#downloaded_messagess_counter')
 var evaluated_messagess = document.querySelector('#evaluated_messagess_counter')
@@ -20,7 +20,7 @@ function update_counters() {
 }
 
 function update_counters_if_not_equal() {
-    if (all_messages.innerHTML != evaluated_messagess.innerHTML) {
+    if ((all_messages.innerHTML != evaluated_messagess.innerHTML) || (all_messages.innerHTML == "0")) {
         update_counters()
     } else {
         show_ready_sign()
@@ -35,9 +35,9 @@ setInterval(frame, 100);
 
 function frame() {
     // Move progress bar
-    var step = 100 / parseInt(all_messages.innerHTML);
+    var step = 100 / (parseInt(all_messages.innerHTML)*2);
     elem.style.width = parseInt(start_width.innerHTML) * step + "%";
-    start_width.innerHTML = parseInt(evaluated_messagess.innerHTML);
+    start_width.innerHTML = parseInt(evaluated_messagess.innerHTML) + parseInt(downloaded_messages.innerHTML);
 }
 
 function show_ready_sign() {

@@ -1,12 +1,18 @@
-from django.http.response import HttpResponse
+from django.http.response import Http404, JsonResponse
 from django.shortcuts import redirect, render
 from django.views import generic
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from mailboxes.mixins import PassLoggedUserToFormMixin
 from shared_code.imap_sync import get_mailbox_folder_list, validate_credentials, validate_folder_list
-from shared_code.queries import create_report, get_mailbox_by_owner, get_report_by_mailbox_and_name
-from .mixins import ShowOwnerReportsListMixin, ShowGuestReportsListMixin, ValidateMailboxImapMixin, ValidateMailboxOwnerMixin
+from shared_code.queries import (
+    count_messages_evaluations_in_report,
+     count_messages_in_report,
+     create_report,
+     get_mailbox_by_owner,
+     get_report_by_mailbox_and_name,
+     validate_report_owner)
+from .mixins import ShowOwnerReportsListMixin, ShowGuestReportsListMixin, ValidateMailboxImapMixin, ValidateMailboxOwnerMixin, ValidateReportOwnerMixin
 from .forms import MailboxValidateForm, ReportGenerateForm
 from .tasks import generate_report_task
 
@@ -119,10 +125,38 @@ class MailboxValidateView(ValidateMailboxOwnerMixin, ValidateMailboxImapMixin, P
     success_view = ReportCreateView
 
 
-class ReportShowStatusView(generic.TemplateView):
+class ReportShowStatusView(ValidateReportOwnerMixin, LoginRequiredMixin, generic.TemplateView):
     template_name = 'reports/report_show_status_template.html'
 
     def get_context_data(self, **kwargs):
         context = super(ReportShowStatusView, self).get_context_data(**kwargs)
         context['report_id'] = kwargs.get('pk')
         return context
+
+
+class ReportCheckStatusView(ValidateReportOwnerMixin, LoginRequiredMixin, generic.View):
+
+    def get(self, request, pk, *args, **kwargs):
+        report = validate_report_owner(pk, request.user.id)
+
+        response_body = dict()
+
+        if report:
+            downloaded_messagess_counter = count_messages_in_report(report)
+
+            evaluated_messagess_counter = count_messages_evaluations_in_report(
+                report)
+
+            response_body.update({
+                'all_messagess_counter':
+                report.messages_counter,
+                'downloaded_messagess_counter':
+                downloaded_messagess_counter,
+                'evaluated_messagess_counter':
+                evaluated_messagess_counter
+            })
+
+        else:
+            raise Http404
+
+        return JsonResponse(response_body)
