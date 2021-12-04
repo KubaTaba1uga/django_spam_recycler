@@ -2,18 +2,20 @@ from django.http.response import HttpResponse
 from django.shortcuts import render
 from django.views import generic
 from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
 from mailboxes.mixins import PassLoggedUserToFormMixin
 from shared_code.imap_sync import get_mailbox_folder_list, validate_credentials, validate_folder_list
-from shared_code.queries import get_mailbox_by_owner, create_report
+from shared_code.queries import get_mailbox_by_owner
 from .mixins import ShowOwnerReportsListMixin, ShowGuestReportsListMixin, ValidateMailboxImapMixin, ValidateMailboxOwnerMixin
 from .forms import MailboxValidateForm, ReportGenerateForm
+from .tasks import generate_report_task
 
 
-class ReportListView(ShowOwnerReportsListMixin, ShowGuestReportsListMixin, generic.TemplateView):
+class ReportListView(ShowOwnerReportsListMixin, ShowGuestReportsListMixin, LoginRequiredMixin, generic.TemplateView):
     template_name = 'reports/report_list_template.html'
 
 
-class ReportCreateView(generic.View):
+class ReportCreateView(LoginRequiredMixin, generic.View):
     template_name = 'reports/report_create_template.html'
     http_method_names = ['post']
 
@@ -60,16 +62,25 @@ class ReportCreateView(generic.View):
                             request.user)
 
                         if db_mailbox:
+                            """ TO-DO
+                            Add report validation here
+                            """
 
-                            report = create_report(
-                                report_form.cleaned_data['name'],
-                                db_mailbox,
-                                request.user,
-                                report_form.cleaned_data['start_at'],
-                                report_form.cleaned_data['end_at'])
+                            generate_report_task.delay(
+                                request.user.id,
+                                selected_folder_list,
+                                **mailbox_credentials
+                            )
 
-                            if True or report:
-                                """ Start report evaluation
+                            # report = create_report(
+                            #     report_form.cleaned_data['name'],
+                            #     db_mailbox,
+                            #     request.user,
+                            #     report_form.cleaned_data['start_at'],
+                            #     report_form.cleaned_data['end_at'])
+
+                            if True:
+                                """ Generate report
                                 """
 
                             else:
@@ -94,19 +105,7 @@ class ReportCreateView(generic.View):
         return self.render_site(request, **mailbox_credentials, form=report_form)
 
 
-class MailboxValidateView(ValidateMailboxOwnerMixin, ValidateMailboxImapMixin, PassLoggedUserToFormMixin, generic.FormView):
+class MailboxValidateView(ValidateMailboxOwnerMixin, ValidateMailboxImapMixin, PassLoggedUserToFormMixin, LoginRequiredMixin, generic.FormView):
     template_name = 'reports/mailbox_validate_template.html'
     form_class = MailboxValidateForm
     success_view = ReportCreateView
-
-from config.celery import debug_task
-from .tasks import create_user_spam_queue
-
-
-class TestRabbitMqView(generic.View):
-
-    def get(self, request, *args, **kwargs):
-        queue = create_user_spam_queue(request.user.id)
-        for i in range(30):
-            debug_task.apply_async(queue=queue)
-        return HttpResponse('OK')

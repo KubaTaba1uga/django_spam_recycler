@@ -1,19 +1,38 @@
-from shared_code.name_utils import create_user_spam_queue_name
-from subprocess import Popen, PIPE
+from random import randint
+from socket import gaierror
+from celery import shared_task, Task
+from shared_code.worker_utils import create_user_email_queue, create_user_spam_queue
 
-SCRIPT_PATH = './scripts/set_up_user_queues.py'
+"""
+    Shedule periodic task to check if user has reports to generate
+    If not kill user spam and email workers
 
-COMMAND_EXEC = 'poetry run python'
+    Run every 5 minutes
+
+    Kill workers if:
+        1. Spam queue is empty
+        2. Email queue is empty
+        3. There are no new generate report tasks for user
+"""
 
 
-def execute_command(command):
-    return Popen(command.split(), stdout=PIPE)
+class BaseTaskWithRetry(Task):
+    autoretry_for = (gaierror, ValueError)
+    retry_kwargs = {'max_retries': 5}
+    retry_backoff = randint(1, 90)
+    retry_jitter = True
 
 
-def create_user_spam_queue(user_id):
+@shared_task
+def generate_report_task(
+        user_id, folder_list, email_address, server_address, password):
     """
-    Create a queue for each user
+    Generate spam evaluation report for user with user_id
+    :param user_id:
+    :return:
     """
-    queue_name = create_user_spam_queue_name(user_id)
-    execute_command(f'{COMMAND_EXEC} {SCRIPT_PATH} {user_id}')
-    return queue_name
+
+    create_user_email_queue(user_id)
+    create_user_spam_queue(user_id)
+
+    return "Report for user {} has been generated".format(user_id)

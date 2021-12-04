@@ -2,9 +2,9 @@ import sys
 from subprocess import Popen, PIPE, CalledProcessError
 import json
 
-PIDFILES_FOLDER = '/home/taba1uga/celery_workers/'
+PIDFILES_FOLDER = '/home/taba1uga/Pulpit/spam_segregator/scripts/pid_locks'
 """ Store pidfiles on disk to avoid multiple
-        workers for the same user
+        workers with the same name
 """
 
 
@@ -16,16 +16,24 @@ def unpack_json(json_string):
     return output
 
 
-def create_worker_name(user_id):
-    return f'user_{user_id}_celery_worker'
+def create_spam_worker_name(user_id):
+    return f'user_{user_id}_spam_worker'
+
+
+def create_email_worker_name(user_id):
+    return f'user_{user_id}_email_worker'
 
 
 def create_worker_celery_name(worker_name):
     return f"celery@{worker_name}"
 
 
-def create_user_spam_queue(user_id):
+def create_user_spam_queue_name(user_id):
     return f'user_{user_id}_spam_queue'
+
+
+def create_user_email_queue_name(user_id):
+    return f'user_{user_id}_email_queue'
 
 
 def execute_command(command):
@@ -110,6 +118,7 @@ def main(worker_name, spam_queue_name):
     """
 
     worker_celery_name = create_worker_celery_name(worker_name)
+
     create_worker(worker_name)
 
     if not does_worker_exist(worker_celery_name):
@@ -134,11 +143,25 @@ def main(worker_name, spam_queue_name):
 
 if __name__ == '__main__':
     """
-    Each user should have a worker and a queue specially for spam evaluation
-        the goal is evaluating and downloading spam emails simultaneously
+    Each user should have seperate workers and a queues for spam evaluation and messages downloading
+        the goal is to evaluate and download emails simultaneously
+
+    Usage:
+        python set_up_user_queues.py <user_id> spam/email
+
+        Exmple:
+            python set_up_user_queues.py <user_id> spam
+            python set_up_user_queues.py <user_id> email
     """
     user_id = sys.argv[1]
+    worker_type = sys.argv[2]
 
-    worker_name = create_worker_name(user_id)
-    spam_queue_name = create_user_spam_queue(user_id)
-    main(worker_name, spam_queue_name)
+    if worker_type == 'spam':
+        worker_name = create_spam_worker_name(user_id)
+        queue_name = create_user_spam_queue_name(user_id)
+
+    elif worker_type == 'email':
+        worker_name = create_email_worker_name(user_id)
+        queue_name = create_user_email_queue_name(user_id)
+
+    main(worker_name, queue_name)
