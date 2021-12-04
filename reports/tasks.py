@@ -86,8 +86,6 @@ def generate_report_task(
 
     return "Report for user {} has been generated".format(user_id)
 
-# Trigger message spam evaluation by DB save of MessageModel
-
 
 @shared_task(base=BaseTaskWithRetry)
 def evaluate_message_spam(message, message_id):
@@ -98,12 +96,13 @@ def evaluate_message_spam(message, message_id):
         report['spam_description'],
      message_id)
 
-    return message_evaluation
+    return "Spam evaluation for message {} has been created".format(message_id)
 
 
 @receiver(post_save, sender=MessageModel)
 def queue_task(sender, instance, created, **kwargs):
-
+    """ Evaluate message spam when message is saved to db
+    """
     spam_queue = create_user_spam_queue_name(instance.report.mailbox.owner.id)
 
     message = str(instance.orginal_message)

@@ -5,7 +5,7 @@ from .views import (
      ReportListView,
      ReportCreateView,
      ReportShowStatusView,
-     ReportCheckStatusView)
+     ReportCheckStatusView, ReportIsReadyView, ReportDetailsView)
 
 urlpatterns = [
     path('list', ReportListView.as_view(), name='report_list_url'),
@@ -19,5 +19,12 @@ urlpatterns = [
          name='report_show_status_url'),
     path('<int:pk>/check_status',
          ReportCheckStatusView.as_view(),
-         name='report_check_status_url')
+         name='report_check_status_url'),
+     path(
+         '<int:pk>/ready',
+         ReportIsReadyView.as_view(),
+     name='report_is_ready_url'),
+     path('<int:pk>/details',
+          ReportDetailsView.as_view(),
+          name='report_details_url'),
 ]

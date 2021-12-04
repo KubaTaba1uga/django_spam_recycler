@@ -47,7 +47,7 @@
   </div>
 </div> 
  <div class="col-xs-1 text-center mt-5" id="ready_sign" hidden>
-    {% comment %} <a href="{% url 'reports:report_ready_url' report_id %} "><button class="bn632-hover bn22">Ready!</button></a> {% endcomment %}
+    <a href="{% url 'reports:report_is_ready_url' report_id %} "><button class="bn632-hover bn22">Ready!</button></a>
 </div>
 {% load static %} 
 <script src="{% static 'js/report_show_status.js' %}"></script>

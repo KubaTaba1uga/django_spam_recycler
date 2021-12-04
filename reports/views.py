@@ -16,6 +16,7 @@ from shared_code.queries import (
 from .mixins import ShowOwnerReportsListMixin, ShowGuestReportsListMixin, ValidateMailboxImapMixin, ValidateMailboxOwnerMixin, ValidateReportOwnerMixin
 from .forms import MailboxValidateForm, ReportGenerateForm
 from .tasks import generate_report_task
+from .models import ReportModel
 
 
 class ReportListView(ShowOwnerReportsListMixin, ShowGuestReportsListMixin, LoginRequiredMixin, generic.TemplateView):
@@ -161,3 +162,21 @@ class ReportCheckStatusView(ValidateReportOwnerMixin, LoginRequiredMixin, generi
             raise Http404
 
         return JsonResponse(response_body)
+
+
+class ReportIsReadyView(ValidateReportOwnerMixin, generic.View):
+
+    def get(self, request, pk, *args, **kwargs):
+
+        report = get_report_by_id_and_owner(pk, request.user.id)
+
+        if count_messages_in_report(report) == count_messages_evaluations_in_report(report):
+            return redirect(reverse_lazy('reports:report_details_url', args=[pk]))
+        else:
+            return redirect(reverse_lazy('reports:report_check_progress_url', args=[pk]))
+
+
+class ReportDetailsView(generic.DetailView):
+    template_name = 'reports/report_details_template.html'
+    model = ReportModel
+    context_object_name = 'report'
