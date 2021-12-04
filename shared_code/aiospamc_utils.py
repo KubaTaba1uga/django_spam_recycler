@@ -12,10 +12,6 @@ async def report_for_spam(message):
     return await aiospamc.report(message=message)
 
 
-async def report_spam_async(message):
-    return await report_for_spam(message.obj)
-
-
 async def create_report(message):
     SPAM_DESCRIPTION_START = 'pts rule name'
     response = await report_for_spam(message)

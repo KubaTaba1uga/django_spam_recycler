@@ -80,24 +80,28 @@ def generate_report_task(
     report.save()
 
     return "Report for user {} has been generated".format(user_id)
-
-# from django.db.models.signals import post_save
-# from django.dispatch import receiver
-# from celery import shared_task
-# from shared_code.aiospamc_utils import create_report
+import asyncio
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from celery import shared_task
+from shared_code.aiospamc_utils import create_report
 
 # Trigger message spam evaluation by DB save of MessageModel
 
 
-# @shared_task
-# def evaluate_message_spam(message):
-#     report = create_report(message)
-#     return report
+@shared_task
+def evaluate_message_spam(message):
+    # report = asyncio.run(create_report(message))
+    return type(message)
 
 
-# @receiver(post_save, sender=MessageModel)
-# def queue_task(sender, instance, created, **kwargs):
-#     spam_queue = create_user_spam_queue_name(instance.report.mailbox.owner.id)
-#     evaluate_message_spam.apply_async(
-#         args=[instance.orginal_message],
-#         queue=spam_queue)
+@receiver(post_save, sender=MessageModel)
+def queue_task(sender, instance, created, **kwargs):
+
+    spam_queue = create_user_spam_queue_name(instance.report.mailbox.owner.id)
+
+    message = str(instance.orginal_message)
+
+    evaluate_message_spam.apply_async(
+        args=[message],
+        queue=spam_queue)
