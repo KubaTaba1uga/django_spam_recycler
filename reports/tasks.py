@@ -2,6 +2,7 @@ from random import randint
 from socket import gaierror
 from celery import shared_task, Task
 from shared_code.queries import create_report
+from shared_code.queries import create_message as save_message_to_db
 from shared_code.worker_utils import create_user_email_queue, create_user_spam_queue
 from shared_code.imap_sync import create_search_from_str, gather_emails_GUIDs, download_message_by_guid
 """
@@ -35,10 +36,21 @@ def create_email(message):
 
 
 @shared_task(base=BaseTaskWithRetry)
-def download_email_task(email_guid, mailbox_credentials):
+def download_email_task(email_guid, mailbox_credentials, folder, report_id):
+
     message = download_message_by_guid(mailbox_credentials, guid=email_guid)
+
     message = create_email(message)
-    # save_email_to_db(message)
+
+    save_message_to_db(
+        message['subject'],
+        message['sender'],
+        message['to_recipients'],
+        message['received_at'],
+        message['body'],
+        folder,
+        report_id
+    )
 
 
 @shared_task
@@ -76,7 +88,7 @@ def generate_report_task(
         for email_guid in gather_emails_GUIDs(mailbox_credentials=mailbox_credentials, folder=folder, search=search):
             download_email_task.apply_async(
                 args=[email_guid,
-                      mailbox_credentials],
+                      mailbox_credentials, folder, report.id],
                 queue=email_queue)
 
     return "Report for user {} has been generated".format(user_id)
