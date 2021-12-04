@@ -5,6 +5,8 @@ from shared_code.queries import get_report_by_id_and_owner
 from shared_code.queries import create_message as save_message_to_db
 from shared_code.worker_utils import create_user_email_queue, create_user_spam_queue
 from shared_code.imap_sync import create_search_from_str, gather_emails_GUIDs, download_message_by_guid, parse_message
+from shared_code.name_utils import create_user_spam_queue_name
+from .models import MessageModel
 """
     Shedule periodic task to check if user has reports to generate
     If not kill user spam and email workers
@@ -78,3 +80,24 @@ def generate_report_task(
     report.save()
 
     return "Report for user {} has been generated".format(user_id)
+
+# from django.db.models.signals import post_save
+# from django.dispatch import receiver
+# from celery import shared_task
+# from shared_code.aiospamc_utils import create_report
+
+# Trigger message spam evaluation by DB save of MessageModel
+
+
+# @shared_task
+# def evaluate_message_spam(message):
+#     report = create_report(message)
+#     return report
+
+
+# @receiver(post_save, sender=MessageModel)
+# def queue_task(sender, instance, created, **kwargs):
+#     spam_queue = create_user_spam_queue_name(instance.report.mailbox.owner.id)
+#     evaluate_message_spam.apply_async(
+#         args=[instance.orginal_message],
+#         queue=spam_queue)
