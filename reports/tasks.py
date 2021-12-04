@@ -1,8 +1,9 @@
 from random import randint
 from socket import gaierror
 from celery import shared_task, Task
+from shared_code.queries import create_report
 from shared_code.worker_utils import create_user_email_queue, create_user_spam_queue
-from shared_code.imap_sync import create_mailbox
+from shared_code.imap_sync import create_search_from_str, gather_emails_GUIDs, download_message_by_guid
 """
     Shedule periodic task to check if user has reports to generate
     If not kill user spam and email workers
@@ -23,17 +24,33 @@ class BaseTaskWithRetry(Task):
     retry_jitter = True
 
 
-def gather_emails_GUIDs(mailbox, search):
-    """ Download GUID of messages passing search requirements
-    """
-    return (email for email in mailbox.uids(search))
+def create_email(message):
+    return {
+        'subject': message.subject,
+        'sender': message.from_values.email,
+        'to_recipients': " ,".join(to.email for to in message.to_values),
+        'received_at': message.date,
+        'body': message.html
+    }
+
+
+@shared_task(base=BaseTaskWithRetry)
+def download_email_task(email_guid, mailbox_credentials):
+    message = download_message_by_guid(mailbox_credentials, guid=email_guid)
+    message = create_email(message)
+    # save_email_to_db(message)
 
 
 @shared_task
 def generate_report_task(
-        user_id, folder_list, start_date, end_date, mailbox_credentials):
+        user_id, folder_list, start_date, end_date, mailbox_credentials, report_name, mailbox_id):
     """
     Generate spam evaluation report for user with user_id
+
+    Set up worker and queue for email downloading
+    Set up worker and queue for spam evaluation
+
+
     :param user_id: int
     :param folder_list: list
     :param start_date: str
@@ -47,9 +64,19 @@ def generate_report_task(
     email_queue = create_user_email_queue(user_id)
     spam_queue = create_user_spam_queue(user_id)
 
-    mailbox = create_mailbox(**mailbox_credentials)
+    search = create_search_from_str(start_date, end_date)
 
-    for email in gather_emails_GUIDs(mailbox, folder_list):
-        pass
-    return email
+    report = create_report(
+        name=report_name,
+        start_at=start_date,
+        end_at=end_date,
+        mailbox_id=mailbox_id)
+
+    for folder in folder_list:
+        for email_guid in gather_emails_GUIDs(mailbox_credentials=mailbox_credentials, folder=folder, search=search):
+            download_email_task.apply_async(
+                args=[email_guid,
+                      mailbox_credentials],
+                queue=email_queue)
+
     return "Report for user {} has been generated".format(user_id)

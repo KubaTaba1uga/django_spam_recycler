@@ -125,9 +125,9 @@ def create_mailbox_decorator(func):
 
 
     """
-    def decorator(email_address, server_address, password, *args, **kwargs):
+    def decorator(mailbox_credentials, *args, **kwargs):
 
-        mailbox = create_mailbox(email_address, server_address, password)
+        mailbox = create_mailbox(**mailbox_credentials)
 
         result = func(mailbox, *args, **kwargs)
 
@@ -142,3 +142,17 @@ def create_mailbox_decorator(func):
 def get_mailbox_folder_list(mailbox):
     folder_list = mailbox.folder.list()
     return folder_list
+
+
+@create_mailbox_decorator
+def gather_emails_GUIDs(mailbox, search, folder):
+    """ Download GUID of messages passing search requirements
+    """
+    mailbox.folder.set(folder)
+    return (email for email in mailbox.uids(search))
+
+
+@create_mailbox_decorator
+def download_message_by_guid(mailbox, guid):
+    for email in mailbox.fetch(AND(uid=[guid])):
+        return email

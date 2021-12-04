@@ -89,14 +89,18 @@ def get_mailbox_by_owner(email_address, user):
     return MailboxModel.objects.filter(email_address=email_address, owner=user).first()
 
 
-def create_report(name, mailbox, user, start_at, end_at):
+def create_report(name, mailbox_id, start_at, end_at):
     try:
         return ReportModel.objects.create(
             name=name,
-            mailbox=mailbox,
+            mailbox_id=mailbox_id,
             start_at=start_at,
             end_at=end_at,
             messages_counter=0)
     except Exception as e:
         logging.error(f'Failed to create report: {e}')
         return False
+
+
+def get_report_by_mailbox_and_name(name, mailbox):
+    return ReportModel.objects.filter(name=name, mailbox=mailbox).first()

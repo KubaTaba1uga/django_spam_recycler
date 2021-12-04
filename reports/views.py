@@ -5,7 +5,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from mailboxes.mixins import PassLoggedUserToFormMixin
 from shared_code.imap_sync import get_mailbox_folder_list, validate_credentials, validate_folder_list
-from shared_code.queries import get_mailbox_by_owner
+from shared_code.queries import get_mailbox_by_owner, get_report_by_mailbox_and_name
 from .mixins import ShowOwnerReportsListMixin, ShowGuestReportsListMixin, ValidateMailboxImapMixin, ValidateMailboxOwnerMixin
 from .forms import MailboxValidateForm, ReportGenerateForm
 from .tasks import generate_report_task
@@ -24,7 +24,7 @@ class ReportCreateView(LoginRequiredMixin, generic.View):
         """ Render site without redirection to the other url
         """
         folder_list = get_mailbox_folder_list(
-            email_address, server_address, password)
+            {'email_address': email_address, 'server_address': server_address, 'password': password})
 
         return render(request, self.template_name, context={
             'folder_list': (folder.name for folder in folder_list),
@@ -60,35 +60,35 @@ class ReportCreateView(LoginRequiredMixin, generic.View):
                     if validate_folder_list(selected_folder_list, imap_mailbox,
                                             report_form):
 
+                        """ Log out imap connection to avoid concurrency errors
+                                imap_mailbox won't be needed anymore after this point
+                        """
+                        imap_mailbox.logout()
+
                         db_mailbox = get_mailbox_by_owner(
                             mailbox_credentials['email_address'],
                             request.user)
 
                         if db_mailbox:
-                            """ TO-DO
-                            Add report validation here
-                            """
 
-                            """ Log out imap connection to avoid concurrency errors
-                            """
-                            imap_mailbox.logout()
-
-                            generate_report_task.delay(
-                                request.user.id,
-                                selected_folder_list,
-                                request.POST.get('start_at'),
-                                request.POST.get('end_at'),
-                                mailbox_credentials
-                            )
-
-                            if True:
+                            if not get_report_by_mailbox_and_name(request.POST['name'], db_mailbox):
                                 """ Generate report
                                 """
+
+                                generate_report_task.delay(
+                                    request.user.id,
+                                    selected_folder_list,
+                                    request.POST['start_at'],
+                                    request.POST['end_at'],
+                                    mailbox_credentials,
+                                    request.POST['name'],
+                                    db_mailbox.id
+                                )
 
                             else:
                                 report_form.add_error(
                                     None,
-                                    'Report creation failed')
+                                    'Report with this name and mailbox already exists')
 
                         else:
                             report_form.add_error(
