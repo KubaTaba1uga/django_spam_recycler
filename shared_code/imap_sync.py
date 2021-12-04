@@ -1,6 +1,7 @@
 from imap_tools.errors import MailboxFolderSelectError
-from imap_tools import MailBox
+from imap_tools import MailBox, AND
 import logging
+import datetime
 
 
 def validate_credentials(email_address, server_address, password):
@@ -34,6 +35,29 @@ def validate_credentials(email_address, server_address, password):
                 pass
     """
     return False
+
+
+def create_search_from_str(start_at, end_at):
+    """ Str formats:
+        start_at: "YYYY-MM-DD"
+          end_at: "YYYY-MM-DD"
+    """
+    start_date_list = start_at.split('-')
+    end_date_list = end_at.split('-')
+
+    start_at_date = datetime.date(
+        int(start_date_list[0]),
+        int(start_date_list[1]),
+     int(start_date_list[2]))
+
+    end_at_date = datetime.date(
+        int(end_date_list[0]),
+        int(end_date_list[1]),
+     int(end_date_list[2]))
+
+    return AND(
+        AND(date_gte=start_at_date),
+        AND(date_lt=end_at_date))
 
 
 def create_mailbox(email_address, server_address, password):
