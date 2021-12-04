@@ -131,3 +131,10 @@ def get_report_by_id_and_owner(report_id, user_id):
 
 def validate_report_owner(report_id, user_id):
     return get_report_by_id_and_owner(report_id, user_id)
+
+
+def create_message_evaluation(spam_score, spam_description, message_id):
+    return MessageEvaluationModel.objects.create(
+        spam_score=spam_score,
+        spam_description=spam_description,
+        message_id=message_id)
