@@ -129,7 +129,23 @@ def get_report_by_id_and_owner(report_id, user_id):
     return ReportModel.objects.filter(pk=report_id, mailbox__owner_id=user_id).first()
 
 
+def get_report_by_id(report_id):
+    return ReportModel.objects.filter(pk=report_id).first()
+
+
+def get_message_by_id(message_id):
+    return MessageModel.objects.filter(pk=message_id).first()
+
+
+def get_message_evaluation_by_id(message_evaluation_id):
+    return MessageEvaluationModel.objects.filter(pk=message_evaluation_id).first()
+
+
 def validate_report_owner(report_id, user_id):
+    return get_report_by_id_and_owner(report_id, user_id)
+
+
+def validate_report_guest_or_owner(report_id, user_id):
     return get_report_by_id_and_owner(report_id, user_id)
 
 

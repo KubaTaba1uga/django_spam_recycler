@@ -24,10 +24,7 @@ class MailboxListView(LoginRequiredMixin, ShowOwnerMailboxListMixin, ShowGuestMa
 
 class MailboxCreateView(LoginRequiredMixin, AddMailboxOwnerMixin, ValidateMailboxImapMixin, generic.CreateView):
 
-    """ Create mailbox if:
-        - email server address is valid
-        - email address is valid
-        - email address password is valid
+    """ Create mailbox, after imap validation suceed
     """
     template_name = 'mailboxes/mailbox_create_template.html'
     model = MailboxModel
@@ -46,7 +43,7 @@ class MailboxDetailsView(LoginRequiredMixin, ShowMailboxGuestsMixin, MailboxOwne
     context_object_name = 'mailbox'
 
 
-class MailboxDeleteView(LoginRequiredMixin, generic.DeleteView):
+class MailboxDeleteView(LoginRequiredMixin, MailboxOwnerOnlyMixin, generic.DeleteView):
     template_name = 'mailboxes/mailbox_delete_template.html'
     model = MailboxModel
     context_object_name = 'mailbox'

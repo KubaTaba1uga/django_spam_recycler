@@ -1,7 +1,6 @@
 import asyncio
-from random import randint
-from socket import gaierror
-from celery import shared_task, Task
+import logging
+from celery import shared_task
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from shared_code.aiospamc_utils import create_report
@@ -25,19 +24,27 @@ from .models import MessageModel
         3. There are no new generate report tasks for user
 """
 
+retry_policy = {'max_retries': 30,
+                'interval_start': 5,
+                'interval_step': 5,
+                }
 
-class BaseTaskWithRetry(Task):
-    retry_kwargs = {'max_retries': 5}
-    retry_backoff = randint(1, 90)
-    retry_jitter = True
 
+@shared_task(bind=True)
+def download_email_task(
+        self, email_guid, mailbox_credentials, folder, report_id):
+    try:
+        message = download_message_by_guid(
+            mailbox_credentials,
+            guid=email_guid)
 
-@shared_task(base=BaseTaskWithRetry)
-def download_email_task(email_guid, mailbox_credentials, folder, report_id):
+        message = parse_message(message)
 
-    message = download_message_by_guid(mailbox_credentials, guid=email_guid)
-
-    message = parse_message(message)
+    except Exception as e:
+        """ Because of hard to predict errors in imap-tools, retry on every Exception
+        """
+        logging.error(e)
+        raise self.retry(exc=e)
 
     save_message_to_db(
         message['subject'],
@@ -78,7 +85,9 @@ def generate_report_task(
             download_email_task.apply_async(
                 args=[email_guid,
                       mailbox_credentials, folder, report_id],
-                queue=email_queue)
+                queue=email_queue,
+                retry=True,
+                retry_policy=retry_policy)
 
             report.messages_counter += 1
 
@@ -87,7 +96,7 @@ def generate_report_task(
     return "Report for user {} has been generated".format(user_id)
 
 
-@shared_task(base=BaseTaskWithRetry)
+@shared_task
 def evaluate_message_spam(message, message_id):
     report = asyncio.run(create_report(message.encode('utf-8')))
 
@@ -109,4 +118,5 @@ def queue_task(sender, instance, created, **kwargs):
 
     evaluate_message_spam.apply_async(
         args=[message, int(instance.id)],
-        queue=spam_queue)
+        queue=spam_queue, retry=True,
+                retry_policy=retry_policy)

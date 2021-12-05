@@ -1,4 +1,4 @@
-from django.http.response import Http404, JsonResponse
+from django.http.response import Http404, HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.views import generic
 from django.urls import reverse_lazy
@@ -10,16 +10,17 @@ from shared_code.queries import (
      count_messages_in_report,
      create_report,
      get_mailbox_by_owner,
+    get_message_evaluation_by_id,
+    get_report_by_id,
     get_report_by_id_and_owner,
-     get_report_by_mailbox_and_name,
-     validate_report_owner)
-from .mixins import ShowOwnerReportsListMixin, ShowGuestReportsListMixin, ValidateMailboxImapMixin, ValidateMailboxOwnerMixin, ValidateReportOwnerMixin
+     get_report_by_mailbox_and_name, get_message_by_id)
+from .mixins import ShowOwnerReportsListMixin, ShowGuestReportsListMixin, ValidateMailboxImapMixin, ValidateMailboxOwnerMixin, ValidateReportOwnerMixin, ValidateReportOwnerOrGuestMixin
 from .forms import MailboxValidateForm, ReportGenerateForm
 from .tasks import generate_report_task
 from .models import ReportModel
 
 
-class ReportListView(ShowOwnerReportsListMixin, ShowGuestReportsListMixin, LoginRequiredMixin, generic.TemplateView):
+class ReportListView(LoginRequiredMixin, ShowOwnerReportsListMixin, ShowGuestReportsListMixin, generic.TemplateView):
     template_name = 'reports/report_list_template.html'
 
 
@@ -55,7 +56,7 @@ class ReportCreateView(LoginRequiredMixin, generic.View):
         if mailbox_credentials['email_address'] and mailbox_credentials['server_address'] and mailbox_credentials['password']:
             """ If mailbox is valid it return logeed in imap Mailbox instance
                     Mailbox instance is reused in validate_folder_list function
-                    to shorten HTTP response time
+                    to shorten HTTP response time of creation connections to IMAP server
             """
             imap_mailbox = validate_credentials(**mailbox_credentials)
 
@@ -121,13 +122,13 @@ class ReportCreateView(LoginRequiredMixin, generic.View):
         return self.render_site(request, **mailbox_credentials, form=report_form)
 
 
-class MailboxValidateView(ValidateMailboxOwnerMixin, ValidateMailboxImapMixin, PassLoggedUserToFormMixin, LoginRequiredMixin, generic.FormView):
+class MailboxValidateView(LoginRequiredMixin, ValidateMailboxOwnerMixin, ValidateMailboxImapMixin, PassLoggedUserToFormMixin, generic.FormView):
     template_name = 'reports/mailbox_validate_template.html'
     form_class = MailboxValidateForm
     success_view = ReportCreateView
 
 
-class ReportShowStatusView(ValidateReportOwnerMixin, LoginRequiredMixin, generic.TemplateView):
+class ReportShowStatusView(LoginRequiredMixin, ValidateReportOwnerOrGuestMixin, generic.TemplateView):
     template_name = 'reports/report_show_status_template.html'
 
     def get_context_data(self, **kwargs):
@@ -136,7 +137,7 @@ class ReportShowStatusView(ValidateReportOwnerMixin, LoginRequiredMixin, generic
         return context
 
 
-class ReportCheckStatusView(ValidateReportOwnerMixin, LoginRequiredMixin, generic.View):
+class ReportCheckStatusView(LoginRequiredMixin, ValidateReportOwnerOrGuestMixin, generic.View):
 
     def get(self, request, pk, *args, **kwargs):
         report = get_report_by_id_and_owner(pk, request.user.id)
@@ -164,19 +165,48 @@ class ReportCheckStatusView(ValidateReportOwnerMixin, LoginRequiredMixin, generi
         return JsonResponse(response_body)
 
 
-class ReportIsReadyView(ValidateReportOwnerMixin, generic.View):
+class ReportIsReadyView(LoginRequiredMixin, ValidateReportOwnerOrGuestMixin, generic.View):
 
     def get(self, request, pk, *args, **kwargs):
 
-        report = get_report_by_id_and_owner(pk, request.user.id)
+        report = get_report_by_id(pk)
 
-        if count_messages_in_report(report) == count_messages_evaluations_in_report(report):
+        if count_messages_in_report(report) == count_messages_evaluations_in_report(report) and report.messages_counter > 0:
             return redirect(reverse_lazy('reports:report_details_url', args=[pk]))
         else:
             return redirect(reverse_lazy('reports:report_show_status_url', args=[pk]))
 
 
-class ReportDetailsView(ValidateReportOwnerMixin, generic.DetailView):
+class ReportDetailsView(LoginRequiredMixin, ValidateReportOwnerOrGuestMixin, generic.DetailView):
     template_name = 'reports/report_details_template.html'
     model = ReportModel
     context_object_name = 'report'
+
+
+class ReportDeleteView(LoginRequiredMixin, ValidateReportOwnerMixin, generic.DeleteView):
+    template_name = 'reports/report_delete_template.html'
+    model = ReportModel
+    context_object_name = 'report'
+    success_url = reverse_lazy('reports:report_list_url')
+
+
+class MessageShowView(LoginRequiredMixin, ValidateReportOwnerOrGuestMixin, generic.View):
+
+        def get(self, request, pk, message_pk, *args, **kwargs):
+            message = get_message_by_id(message_pk)
+
+            if message:
+                return HttpResponse(message.body)
+            else:
+                raise Http404
+
+
+class MessageSpamEvaluationShowView(LoginRequiredMixin, ValidateReportOwnerOrGuestMixin, generic.View):
+
+    def get(self, request, pk, evaluation_pk, *args, **kwargs):
+        spam_evaluation = get_message_evaluation_by_id(evaluation_pk)
+
+        if spam_evaluation:
+            return HttpResponse(spam_evaluation.spam_description)
+        else:
+            raise Http404

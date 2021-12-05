@@ -1,15 +1,16 @@
 import aiospamc
 import codecs
 
+PORT = 9000
 
 async def check_for_spam(message):
     # https://aiospamc.readthedocs.io/en/latest/protocol.html?highlight=threshold#report-request
-    return await aiospamc.check(message=message)
+    return await aiospamc.check(message=message, port=PORT)
 
 
 async def report_for_spam(message):
     # https://aiospamc.readthedocs.io/en/latest/protocol.html?highlight=threshold#report-request
-    return await aiospamc.report(message=message)
+    return await aiospamc.report(message=message, port=PORT)
 
 
 async def create_report(message):
