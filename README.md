@@ -1,7 +1,7 @@
 <h2> SPAM SEGREGATOR </h2>
 
 ## App Goal
-> Download messages using IMAP
+> Download messages using IMAP <br>
 > Analyze messages using Apache Spamassasin - https://spamassassin.apache.org/ 
 
 
