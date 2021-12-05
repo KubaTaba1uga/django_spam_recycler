@@ -26,11 +26,10 @@ from .models import MessageModel
 
 retry_policy = {'max_retries': 30,
                 'interval_start': 5,
-                'interval_step': 5,
-                }
+                'interval_step': 5}
 
 
-@shared_task(bind=True)
+@shared_task(bind=True, **retry_policy)
 def download_email_task(
         self, email_guid, mailbox_credentials, folder, report_id):
     try:
@@ -85,9 +84,7 @@ def generate_report_task(
             download_email_task.apply_async(
                 args=[email_guid,
                       mailbox_credentials, folder, report_id],
-                queue=email_queue,
-                retry=True,
-                retry_policy=retry_policy)
+                queue=email_queue)
 
             report.messages_counter += 1
 

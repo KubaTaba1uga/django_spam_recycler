@@ -219,6 +219,6 @@ class MessageSpamEvaluationShowView(LoginRequiredMixin, ValidateReportOwnerOrGue
         spam_evaluation = get_message_evaluation_by_id(evaluation_pk)
 
         if spam_evaluation:
-            return HttpResponse(spam_evaluation.spam_description)
+            return HttpResponse(spam_evaluation.spam_description, content_type='text/plain')
         else:
             raise Http404
