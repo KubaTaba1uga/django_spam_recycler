@@ -119,8 +119,16 @@ def get_report_messages_by_id(report_id):
     return MessageModel.objects.filter(report_id=report_id).all()
 
 
-def get_report_messages_evaluations_and_messages_by_id(report_id):
-    return MessageEvaluationModel.objects.filter(message__report_id=report_id).select_related('message').all()
+def get_report_messages_evaluations_by_id_query(report_id):
+    return MessageEvaluationModel.objects.filter(message__report_id=report_id)
+
+
+def get_report_details_template_data(report_id):
+    """ Select required fields to to avoid long
+            template rendering time
+    """
+    return get_report_messages_evaluations_by_id_query(
+        report_id).values('spam_score', 'pk', 'message__pk', 'message__sender', 'message__subject', 'message__received_at', 'message__folder').all()
 
 
 def count_messages_in_report(report):

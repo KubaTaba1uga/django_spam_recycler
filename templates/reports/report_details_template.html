@@ -46,14 +46,14 @@
             <tbody>
                 {% for evaluation in message_evaluation_list %}
                     <tr>
-                        <th> {{ evaluation.message.subject }} </th>
-                        <th> {{ evaluation.message.sender }} </th>
-                        <th> {{ evaluation.message.received_at }} </th>
-                        <th> {{ evaluation.message.folder }} </th>
+                        <th> {{ evaluation.message__subject }} </th>
+                        <th> {{ evaluation.message__sender }} </th>
+                        <th> {{ evaluation.message__received_at }} </th>
+                        <th> {{ evaluation.message__folder }} </th>
                         <th> {{ evaluation.spam_score }} </th>
                         <th>
-                            <a onclick="window.open('{% url 'reports:report_show_message_url' report.pk evaluation.message.pk %}', '{{evaluation.id}}-email', 'height=800,width=400,modal=yes,alwaysRaised=yes')" class="btn btn-primary btn-sm mb-1">Message</a>
-                            <a onclick="window.open('{% url 'reports:report_show_message_evaluation_url' report.pk evaluation.pk %}', '{{evaluation.id}}-spam', 'height=800,width=400,modal=yes,alwaysRaised=yes')" class="btn btn-secondary btn-sm mt-1">Spam Report</a>
+                             <a onclick="window.open('{% url 'reports:report_show_message_url' report.pk evaluation.message__pk %}', '{{evaluation.pk}}-email', 'height=800,width=400,modal=yes,alwaysRaised=yes')" class="btn btn-primary btn-sm mb-1">Message</a>
+                            <a onclick="window.open('{% url 'reports:report_show_message_evaluation_url' report.pk evaluation.pk %}', '{{evaluation.pk}}-spam', 'height=800,width=400,modal=yes,alwaysRaised=yes')" class="btn btn-secondary btn-sm mt-1">Spam Report</a>
                         </th>
                     </tr>
                 {% endfor %}
