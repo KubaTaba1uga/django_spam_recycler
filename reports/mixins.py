@@ -1,6 +1,7 @@
+from django.http.response import Http404
 from django.views.generic.edit import FormMixin
 from django.core.exceptions import PermissionDenied
-from shared_code.queries import get_user_owner_reports, get_user_guest_reports, get_mailbox_query, get_mailbox_owner
+from shared_code.queries import get_user_owner_reports, get_user_guest_reports, get_mailbox_query, get_mailbox_owner, validate_report_owner
 from shared_code.imap_sync import validate_credentials
 
 
@@ -79,3 +80,14 @@ class ValidateMailboxOwnerMixin(FormMixin):
             raise PermissionDenied('You are not owner of this mailbox')
 
         return super().form_valid(form)
+
+
+class ValidateReportOwnerMixin:
+
+    def get(self, request, *args, **kwargs):
+        report_id = kwargs.get('pk', 0)
+
+        if not validate_report_owner(report_id, request.user.id):
+            raise Http404
+
+        return super().get(request, *args, **kwargs)

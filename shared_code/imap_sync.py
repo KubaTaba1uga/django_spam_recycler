@@ -1,9 +1,10 @@
 from imap_tools.errors import MailboxFolderSelectError
-from imap_tools import MailBox
+from imap_tools import MailBox, AND
 import logging
+import datetime
 
 
-def validate_credentials(server_address, email_address, password):
+def validate_credentials(email_address, server_address, password):
     """Validate IMAP credentials.
         If IMAP validation succeed
          return True
@@ -14,7 +15,7 @@ def validate_credentials(server_address, email_address, password):
         password (str): [password which app should validate]
 
     Returns:
-        [bool]: [True if credentials are valid,
+        [MailBox/bool]: [MailBox if credentials are valid,
                   False if credentials are not valid]
     """
 
@@ -36,9 +37,32 @@ def validate_credentials(server_address, email_address, password):
     return False
 
 
-def get_mailbox_folder_list(server_address, email_address, password):
+def create_search_from_str(start_at, end_at):
+    """ Str formats:
+        start_at: "YYYY-MM-DD"
+          end_at: "YYYY-MM-DD"
+    """
+    start_date_list = start_at.split('-')
+    end_date_list = end_at.split('-')
+
+    start_at_date = datetime.date(
+        int(start_date_list[0]),
+        int(start_date_list[1]),
+     int(start_date_list[2]))
+
+    end_at_date = datetime.date(
+        int(end_date_list[0]),
+        int(end_date_list[1]),
+     int(end_date_list[2]))
+
+    return AND(
+        AND(date_gte=start_at_date),
+        AND(date_lt=end_at_date))
+
+
+def create_mailbox(email_address, server_address, password):
     return MailBox(server_address).login(
-        email_address, password).folder.list()
+        email_address, password)
 
 
 def validate_folder(mailbox, folder):
@@ -77,3 +101,69 @@ def validate_folder_list(folder_list, mailbox, form):
         return True
     else:
         return False
+
+
+def create_mailbox_decorator(func):
+    """ If function use Mailbox object,
+            use decorator to avoid creating MailBox object
+            inside function
+
+        Example:
+            Without decorator
+
+                def get_mailbox_folder_list(email_address, server_address, password):
+                    mailbox = create_mailbox(email_address, server_address, password)
+                    folder_list = mailbox.folder.list()
+                    mailbox.logut()
+                    return folder_list
+
+            With decorator
+
+                @create_mailbox_decorator
+                def get_mailbox_folder_list(mailbox):
+                    return mailbox.folder.list()
+
+
+    """
+    def decorator(mailbox_credentials, *args, **kwargs):
+
+        mailbox = create_mailbox(**mailbox_credentials)
+
+        result = func(mailbox, *args, **kwargs)
+
+        mailbox.logout()
+
+        return result
+
+    return decorator
+
+
+@create_mailbox_decorator
+def get_mailbox_folder_list(mailbox):
+    folder_list = mailbox.folder.list()
+    return folder_list
+
+
+@create_mailbox_decorator
+def gather_emails_GUIDs(mailbox, search, folder):
+    """ Download GUID of messages passing search requirements
+    """
+    mailbox.folder.set(folder)
+    return (email for email in mailbox.uids(search))
+
+
+@create_mailbox_decorator
+def download_message_by_guid(mailbox, guid):
+    for email in mailbox.fetch(AND(uid=[guid])):
+        return email
+
+
+def parse_message(message):
+    return {
+        'subject': message.subject,
+        'sender': message.from_values.email,
+        'to_recipients': " ,".join(to.email for to in message.to_values),
+        'received_at': message.date,
+        'body': message.html,
+        'orginal_message': message.obj
+    }

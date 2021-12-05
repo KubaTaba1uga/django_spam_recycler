@@ -43,6 +43,7 @@ class MessageModel(models.Model):
     report = models.ForeignKey(ReportModel,
                                on_delete=models.CASCADE,
                                related_name='messages')
+    orginal_message = models.TextField()
 
     def __str__(self):
         return self.subject

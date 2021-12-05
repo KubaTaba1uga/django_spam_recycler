@@ -1,6 +1,6 @@
 import logging
 from mailboxes.models import MailboxModel, MailboxGuestModel
-from reports.models import ReportModel
+from reports.models import ReportModel, MessageModel, MessageEvaluationModel
 
 
 def get_user_guest_mailboxes(user):
@@ -89,14 +89,52 @@ def get_mailbox_by_owner(email_address, user):
     return MailboxModel.objects.filter(email_address=email_address, owner=user).first()
 
 
-def create_report(name, mailbox, user, start_at, end_at):
-    try:
-        return ReportModel.objects.create(
-            name=name,
-            mailbox=mailbox,
+def create_report(name, mailbox_id, start_at, end_at):
+    return ReportModel.objects.create(
+        name=name,
+            mailbox_id=mailbox_id,
             start_at=start_at,
             end_at=end_at,
             messages_counter=0)
-    except Exception as e:
-        logging.error(f'Failed to create report: {e}')
-        return False
+
+
+def create_message(subject, sender, to_recipients,
+                   received_at, body, orginal_message, folder, report_id):
+    return MessageModel.objects.create(
+        subject=subject,
+        sender=sender,
+        to_recipients=to_recipients,
+        received_at=received_at,
+        body=body,
+        folder=folder,
+        report_id=report_id,
+        orginal_message=orginal_message)
+
+
+def get_report_by_mailbox_and_name(name, mailbox):
+    return ReportModel.objects.filter(name=name, mailbox=mailbox).first()
+
+
+def count_messages_in_report(report):
+    return MessageModel.objects.filter(
+        report=report).count()
+
+
+def count_messages_evaluations_in_report(report):
+    return MessageEvaluationModel.objects.filter(
+        message__report=report).count()
+
+
+def get_report_by_id_and_owner(report_id, user_id):
+    return ReportModel.objects.filter(pk=report_id, mailbox__owner_id=user_id).first()
+
+
+def validate_report_owner(report_id, user_id):
+    return get_report_by_id_and_owner(report_id, user_id)
+
+
+def create_message_evaluation(spam_score, spam_description, message_id):
+    return MessageEvaluationModel.objects.create(
+        spam_score=spam_score,
+        spam_description=spam_description,
+        message_id=message_id)
