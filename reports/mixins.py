@@ -1,7 +1,13 @@
 from django.http.response import Http404
 from django.views.generic.edit import FormMixin
 from django.core.exceptions import PermissionDenied
-from shared_code.queries import get_user_owner_reports, get_user_guest_reports, get_mailbox_query, get_mailbox_owner, validate_report_owner
+from shared_code.queries import (
+    get_user_owner_reports,
+     get_user_guest_reports,
+     get_mailbox_query,
+     get_mailbox_owner,
+     validate_report_owner,
+     get_report_by_id, get_mailbox_guests)
 from shared_code.imap_sync import validate_credentials
 
 
@@ -84,10 +90,32 @@ class ValidateMailboxOwnerMixin(FormMixin):
 
 class ValidateReportOwnerMixin:
 
-    def get(self, request, *args, **kwargs):
+    def dispatch(self, request, *args, **kwargs):
+        """ Allow user if is owner of report.mailbox
+        """
+
         report_id = kwargs.get('pk', 0)
 
         if not validate_report_owner(report_id, request.user.id):
-            raise Http404
+            raise PermissionDenied
+        else:
+            return super().dispatch(request, *args, **kwargs)
 
-        return super().get(request, *args, **kwargs)
+
+class ValidateReportOwnerOrGuestMixin:
+
+    def dispatch(self, request, *args, **kwargs):
+        """ Allow user if is owner or guest of report.mailbox
+        """
+
+        report_id = self.kwargs.get('pk', 0)
+
+        report = get_report_by_id(report_id)
+        is_owner = get_mailbox_owner(report.mailbox.id) == self.request.user
+
+        is_guest = self.request.user in get_mailbox_guests(report.mailbox.id)
+
+        if is_owner or is_guest:
+            return super().dispatch(request, *args, **kwargs)
+        else:
+            raise PermissionDenied

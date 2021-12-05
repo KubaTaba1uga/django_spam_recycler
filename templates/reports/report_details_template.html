@@ -1,8 +1,9 @@
 {% extends '_base.html' %}
 
 {% block title %}Report Details{% endblock %}
+
 {% block content %}
-<h2 class='d-inline-block'>Report</h2>
+<h2 class='d-inline-block'>Report Details</h2>
 <div class='container'>
     <dl class='row'>
         <dt class="col-sm-3">Report Name</dt>
@@ -11,32 +12,53 @@
         <dd class="col-sm-9">{{ report.mailbox.email_address }}</dd>
         <dt class="col-sm-3">Owner</dt>
         <dd class="col-sm-9">{{ report.mailbox.owner }}</dd>
+        <dt class="col-sm-3">Messages counter</dt>
+        <dd class="col-sm-9">{{ report.messages_counter }}</dd>
     </dl>
 </div>
-<div>
-    <table class='table'>
-      <thead>
-      <tr>
-        <th scope="col">Subject</th>
-        <th scope="col">Spam Score</th>
-      <th scope="col"></th>
-      </tr>
-    </thead>
-    <tbody>
-        {% for message in report.messages.all %}
-            <tr>
-                <th>
-                    {{ message.subject }}
-                </th>
-                <td>
-                    {{ message.spam_evaluation.spam_score }}
-                </td>
-                <td>
-                    {% comment %} <a href="{% url 'reports:message_details_url' message.pk %}" class='btn  btn-secondary' type='button'>Details</a> {% endcomment %}
-                </td>
-            </tr>
-        
-        {% endfor %}
-    </tbody>
-    </table>
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-table me-1"></i>
+        <h5 class='d-inline-block'>Messages</h5>
+    </div>
+    <div class="card-body">
+        <table id="datatablesSimple">
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Sender</th>
+                    <th>Received</th>
+                    <th>Folder</th>
+                    <th>Spam Score</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th>Subject</th>
+                    <th>Sender</th>
+                    <th>Received</th>
+                    <th>Folder</th>
+                    <th>Spam Score</th>
+                    <th>Actions</th>
+                </tr>
+            </tfoot>
+            <tbody>
+                {% for evaluation in message_evaluation_list %}
+                    <tr>
+                        <th> {{ evaluation.message__subject }} </th>
+                        <th> {{ evaluation.message__sender }} </th>
+                        <th> {{ evaluation.message__received_at }} </th>
+                        <th> {{ evaluation.message__folder }} </th>
+                        <th> {{ evaluation.spam_score }} </th>
+                        <th>
+                             <a onclick="window.open('{% url 'reports:report_show_message_url' report.pk evaluation.message__pk %}', '{{evaluation.pk}}-email', 'height=800,width=400,modal=yes,alwaysRaised=yes')" class="btn btn-primary btn-sm mb-1">Message</a>
+                            <a onclick="window.open('{% url 'reports:report_show_message_evaluation_url' report.pk evaluation.pk %}', '{{evaluation.pk}}-spam', 'height=800,width=400,modal=yes,alwaysRaised=yes')" class="btn btn-secondary btn-sm mt-1">Spam Report</a>
+                        </th>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock content %}

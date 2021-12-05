@@ -115,6 +115,22 @@ def get_report_by_mailbox_and_name(name, mailbox):
     return ReportModel.objects.filter(name=name, mailbox=mailbox).first()
 
 
+def get_report_messages_by_id(report_id):
+    return MessageModel.objects.filter(report_id=report_id).all()
+
+
+def get_report_messages_evaluations_by_id_query(report_id):
+    return MessageEvaluationModel.objects.filter(message__report_id=report_id)
+
+
+def get_report_details_template_data(report_id):
+    """ Select required fields to to avoid long
+            template rendering time
+    """
+    return get_report_messages_evaluations_by_id_query(
+        report_id).values('spam_score', 'pk', 'message__pk', 'message__sender', 'message__subject', 'message__received_at', 'message__folder').all()
+
+
 def count_messages_in_report(report):
     return MessageModel.objects.filter(
         report=report).count()
@@ -129,7 +145,23 @@ def get_report_by_id_and_owner(report_id, user_id):
     return ReportModel.objects.filter(pk=report_id, mailbox__owner_id=user_id).first()
 
 
+def get_report_by_id(report_id):
+    return ReportModel.objects.filter(pk=report_id).first()
+
+
+def get_message_by_id(message_id):
+    return MessageModel.objects.filter(pk=message_id).first()
+
+
+def get_message_evaluation_by_id(message_evaluation_id):
+    return MessageEvaluationModel.objects.filter(pk=message_evaluation_id).first()
+
+
 def validate_report_owner(report_id, user_id):
+    return get_report_by_id_and_owner(report_id, user_id)
+
+
+def validate_report_guest_or_owner(report_id, user_id):
     return get_report_by_id_and_owner(report_id, user_id)
 
 

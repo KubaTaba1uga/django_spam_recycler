@@ -16,7 +16,7 @@
                     <th>Name</th>
                     <th>Mailbox</th>
                     <th>Created At</th>
-                    <th>Done</th>
+                    <th>Owner</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -25,7 +25,7 @@
                     <th>Name</th>
                     <th>Mailbox</th>
                     <th>Created At</th>
-                    <th>Done</th>
+                    <th>Owner</th>
                     <th>Actions</th>
                 </tr>
             </tfoot>
@@ -35,12 +35,10 @@
                         <th>{{report.name}}</th>
                         <th>{{report.mailbox}}</th>
                         <th>{{report.created_at}}</th>
-                        <th>False</th>
+                        <th>True</th>
                         <th>
                             <a href="{% url 'reports:report_is_ready_url' report.pk %}" class="btn btn-primary btn-sm">Details</a>
-                            {% comment %} 
-                            <a href="{% url 'mailbox:mailbox_edit_url' mailbox.pk %}" class="btn btn-warning btn-sm">Edit</a>
-                            <a href="{% url 'mailbox:mailbox_delete_url' mailbox.pk %}" class="btn btn-danger btn-sm">Delete</a> {% endcomment %}
+                            <a href="{% url 'reports:report_delete_url' report.pk %}" class="btn btn-danger btn-sm">Delete</a> 
                         </th>
                     </tr>
                 {% endfor %}
@@ -51,7 +49,7 @@
                         <th>{{report.created_at}}</th>
                         <th>False</th>
                         <th>
-                            
+                            <a href="{% url 'reports:report_is_ready_url' report.pk %}" class="btn btn-primary btn-sm">Details</a>
                         </th>
                     </tr>
                 {% endfor %} 
