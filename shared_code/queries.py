@@ -115,6 +115,14 @@ def get_report_by_mailbox_and_name(name, mailbox):
     return ReportModel.objects.filter(name=name, mailbox=mailbox).first()
 
 
+def get_report_messages_by_id(report_id):
+    return MessageModel.objects.filter(report_id=report_id).all()
+
+
+def get_report_messages_evaluations_and_messages_by_id(report_id):
+    return MessageEvaluationModel.objects.filter(message__report_id=report_id).select_related('message').all()
+
+
 def count_messages_in_report(report):
     return MessageModel.objects.filter(
         report=report).count()

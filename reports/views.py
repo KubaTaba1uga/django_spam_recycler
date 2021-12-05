@@ -13,7 +13,8 @@ from shared_code.queries import (
     get_message_evaluation_by_id,
     get_report_by_id,
     get_report_by_id_and_owner,
-     get_report_by_mailbox_and_name, get_message_by_id)
+     get_report_by_mailbox_and_name, get_message_by_id, get_report_messages_by_id,
+    get_report_messages_evaluations_and_messages_by_id)
 from .mixins import ShowOwnerReportsListMixin, ShowGuestReportsListMixin, ValidateMailboxImapMixin, ValidateMailboxOwnerMixin, ValidateReportOwnerMixin, ValidateReportOwnerOrGuestMixin
 from .forms import MailboxValidateForm, ReportGenerateForm
 from .tasks import generate_report_task
@@ -181,6 +182,15 @@ class ReportDetailsView(LoginRequiredMixin, ValidateReportOwnerOrGuestMixin, gen
     template_name = 'reports/report_details_template.html'
     model = ReportModel
     context_object_name = 'report'
+
+    def get_context_data(self, **kwargs):
+        """ Get report messagess in one query
+                to avoid long template rendering time
+        """
+        context = super().get_context_data(**kwargs)
+        context['message_evaluation_list'] = get_report_messages_evaluations_and_messages_by_id(
+            self.object.id)
+        return context
 
 
 class ReportDeleteView(LoginRequiredMixin, ValidateReportOwnerMixin, generic.DeleteView):
