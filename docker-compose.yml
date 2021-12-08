@@ -10,24 +10,27 @@ services:
     ports:
       - 8000:8000
   
-  # db:
-  #   image: postgres:11
-  #   volumes:
-  #     - postgres_data:/var/lib/postgresql/data/
-  #   environment:
-  #     - "POSTGRES_HOST_AUTH_METHOD=trust"
+  db:
+    container_name: "database"
+    image: postgres:11
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - "POSTGRES_HOST_AUTH_METHOD=trust"
   
-  # rabbitmq:
-  #   container_name: "message_broker"
-  #   image: rabbitmq:3.9.11-management
-  #   environment:
-  #     - RABBITMQ_DEFAULT_USER=$RABBITMQ_DEFAULT_USER
-  #     - RABBITMQ_DEFAULT_PASS=$RABBITMQ_DEFAULT_PASSWORD
-  #   ports:
-  #     # AMQP protocol port
-  #     - '5672:5672'
-  #     # HTTP management UI
-  #     - '15672:15672'
+  rabbitmq:
+    container_name: "message_broker"
+    image: rabbitmq:3.9.11-management
+    environment:
+      # HTTP management UI credentials
+      - RABBITMQ_DEFAULT_USER=$RABBITMQ_USER
+      - RABBITMQ_DEFAULT_PASS=$RABBITMQ_PASSWORD
+      - RABBITMQ_DEFAULT_VHOST=$RABBITMQ_VHOST"/"
+    ports:
+      # AMQP protocol port
+      - '5672:5672'
+      # HTTP management UI port
+      - '15672:15672'
     
-
-
+volumes:
+  postgres_data:
