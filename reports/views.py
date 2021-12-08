@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from mailboxes.mixins import PassLoggedUserToFormMixin
 from shared_code.imap_sync import get_mailbox_folder_list, validate_credentials, validate_folder_list
-from shared_code.name_utils import create_email_worker_celery_name, create_email_worker_name, create_spam_worker_celery_name, create_spam_worker_name
+from shared_code.name_utils import create_email_worker_celery_name, create_email_worker_name, create_spam_worker_celery_name, create_spam_worker_name, create_worker_celery_name
 from shared_code.queries import (
     count_messages_evaluations_in_report,
      count_messages_in_report,
@@ -229,7 +229,7 @@ from config.celery import app
 
 
 class DeleteWorkerTestView(generic.View):
-    MAIN_WORKER_NAME = 'main_worker'
+    MAIN_WORKER_NAME = create_worker_celery_name('main_worker')
 
     def get(self, request, *args, **kwargs):
         main_inspect = app.control.inspect([self.MAIN_WORKER_NAME])
@@ -239,31 +239,48 @@ class DeleteWorkerTestView(generic.View):
 
             spam_inspect = app.control.inspect([spam_worker_name])
             email_inspect = app.control.inspect([email_worker_name])
+
+            main_tasks = main_inspect.active().get(
+                self.MAIN_WORKER_NAME) + main_inspect.reserved().get(self.MAIN_WORKER_NAME)
+
+            if main_tasks:
+                """ If main queue is proceeding any user task, skip workers deleting
+                """
+                is_proceeding = False
+
+                for task in main_tasks:
+                    if task['args'][0] == user.id:
+                        is_proceeding = True
+                        break
+
+                if is_proceeding:
+                    continue
+
             if not spam_inspect.active() or not email_inspect.active():
                 """ If workers are not found, skip workers deleting
                 """
                 continue
 
-            if not spam_inspect.active().get(spam_worker_name):
+            if spam_inspect.active().get(spam_worker_name):
                 """ If user spam queue is proceeding any task, skip workers deleting
                 """
                 continue
-            if not spam_inspect.reserved().get(spam_worker_name):
+
+            if spam_inspect.reserved().get(spam_worker_name):
                 """ If user spam queue is not empty, skip workers deleting
                 """
                 continue
 
-            if not email_inspect.active().get(email_worker_name):
+            if email_inspect.active().get(email_worker_name):
                 """ If user email queue is proceeding any task, skip workers deleting
                 """
                 continue
 
-            if not email_inspect.reserved().get(email_worker_name):
+            if email_inspect.reserved().get(email_worker_name):
                 """ If user email queue is not empty, skip workers deleting
                 """
                 continue
 
-            print(main_inspect.active().get(self.MAIN_WORKER_NAME))
             # print('email_reserved', email_inspect.reserved().values())
             # print('email_active', email_inspect.active().values())
             # print('spam_reserved', spam_inspect.reserved())
