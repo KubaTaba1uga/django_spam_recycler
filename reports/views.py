@@ -256,7 +256,7 @@ class DeleteWorkerTestView(generic.View):
                 if is_proceeding:
                     continue
 
-            if not spam_inspect.active() or not email_inspect.active():
+            if not spam_inspect.ping() or not email_inspect.ping():
                 """ If workers are not found, skip workers deleting
                 """
                 continue
@@ -281,15 +281,10 @@ class DeleteWorkerTestView(generic.View):
                 """
                 continue
 
-            # print('email_reserved', email_inspect.reserved().values())
-            # print('email_active', email_inspect.active().values())
-            # print('spam_reserved', spam_inspect.reserved())
-            # print('spam_active', spam_inspect.active())
+            app.control.broadcast(
+                'shutdown',
+                destination=[
+                    spam_worker_name,
+                    email_worker_name])
 
-            # app.control.revoke(spam_worker_name, terminate=True)
-            # app.control.revoke(email_worker_name, terminate=True)
-
-            # spam_tasks = celery_inspect.active([spam_worker_name])
-            # print(spam_tasks)
-            # reserved_tasls = celery_inspect.reserved()
         return HttpResponse(f"active_tasks:\nreserved_tasls:")

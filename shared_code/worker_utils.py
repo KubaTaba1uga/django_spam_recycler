@@ -1,14 +1,22 @@
-from shared_code.name_utils import create_user_spam_queue_name, create_user_email_queue_name
+from shared_code.name_utils import (
+    create_user_spam_queue_name,
+     create_user_email_queue_name,
+     create_spam_worker_name,
+     create_email_worker_name,
+     create_worker_celery_name)
 from subprocess import Popen, PIPE
 
 SCRIPT_PATH = './scripts/set_up_user_queues.py'
 
 COMMAND_EXEC = 'poetry run python'
 
+MAIN_WORKER_NAME = create_worker_celery_name('main_worker')
+
 
 def execute_command(command):
     process = Popen(command.split(), stdout=PIPE)
     if process.wait() != 0:
+        print(process.stdout.read())
         raise Exception(f'Error executing command: {command}')
 
 
