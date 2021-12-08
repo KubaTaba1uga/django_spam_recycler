@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  
   web:
     build: .
     command: python /code/manage.py runserver 0.0.0.0:8000
@@ -8,12 +9,26 @@ services:
       - .:/code
     ports:
       - 8000:8000
+  
   db:
     image: postgres:11
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
       - "POSTGRES_HOST_AUTH_METHOD=trust"
+  
+  rabbitmq:
+    container_name: "message_broker"
+    image: rabbitmq:3.9.11-management
+    environment:
+      - RABBITMQ_DEFAULT_USER=$RABBITMQ_DEFAULT_USER
+      - RABBITMQ_DEFAULT_PASS=$RABBITMQ_DEFAULT_PASSWORD
+    ports:
+      # AMQP protocol port
+      - '5672:5672'
+      # HTTP management UI
+      - '15672:15672'
+    
 
 volumes:
   postgres_data:
