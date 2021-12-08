@@ -37,12 +37,14 @@ def download_email_task(
             mailbox_credentials,
             guid=email_guid)
 
+        if not message:
+            raise LookupError('Message not found')
+
         message = parse_message(message)
 
     except Exception as e:
         """ Because of hard to predict errors in imap-tools, retry on every Exception
         """
-        logging.error(e)
         raise self.retry(exc=e)
 
     save_message_to_db(

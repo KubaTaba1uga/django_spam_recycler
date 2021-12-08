@@ -10,7 +10,7 @@ from .views import (
     ReportDetailsView,
     ReportDeleteView,
     MessageShowView,
-    MessageSpamEvaluationShowView)
+    MessageSpamEvaluationShowView, DeleteWorkerTestView)
 
 urlpatterns = [
     path('list', ReportListView.as_view(), name='report_list_url'),
@@ -41,6 +41,9 @@ urlpatterns = [
     path('<int:pk>/details/<int:evaluation_pk>/evaluation',
          MessageSpamEvaluationShowView.as_view(),
          name='report_show_message_evaluation_url'),
+    path('delete/workers',
+         DeleteWorkerTestView.as_view(),
+         name='delete_worker_url'),
 
 
 ]
