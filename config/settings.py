@@ -181,5 +181,5 @@ ACCOUNT_UNIQUE_EMAIL = True
 # Celery rabbitMQ
 # ------------------------------------------------------------------------------
 # https://docs.celeryproject.org/en/latest/getting-started/backends-and-brokers/rabbitmq.html#setting-up-rabbitmq
-RABBITMQ_USER = os.environ.get('RABBITMQ_USER')
+RABBITMQ_USER = os.environ.get('RABBITMQ_DEFAULT_USER')
 CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672'
