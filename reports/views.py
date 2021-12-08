@@ -249,8 +249,9 @@ class DeleteWorkerTestView(generic.View):
                 is_proceeding = False
 
                 for task in main_tasks:
-                    if task['args'][0] == user.id:
-                        is_proceeding = True
+                    if len(task['args']) > 0:
+                        if task['args'][0] == user.id:
+                            is_proceeding = True
                         break
 
                 if is_proceeding:

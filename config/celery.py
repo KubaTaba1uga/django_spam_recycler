@@ -6,7 +6,7 @@ from __future__ import absolute_import
 import os
 from celery import Celery
 from django.conf import settings
-
+from datetime import timedelta
 # this code copied from manage.py
 # set the default Django settings module for the 'celery' app.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
@@ -21,7 +21,7 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 # load tasks.py in django apps
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
-# create queue if is not exsisting
+# create queues if they are not exsisting
 app.conf.task_create_missing_queues = True
 
 
@@ -39,3 +39,8 @@ def debug_task(self):
         $  celery -A config worker -l info
 
 """
+
+app.conf.beat_schedule = {'cleanup-workers': {
+    'task': 'reports.tasks.delete_workers',
+        'schedule': timedelta(minutes=1),
+}}

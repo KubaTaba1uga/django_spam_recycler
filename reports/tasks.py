@@ -8,23 +8,11 @@ from config.celery import app
 from shared_code.aiospamc_utils import create_report
 from shared_code.queries import get_report_by_id_and_owner, create_message_evaluation
 from shared_code.queries import create_message as save_message_to_db
-from shared_code.worker_utils import create_user_email_queue, create_user_spam_queue, kill_workers, MAIN_WORKER_NAME
+from shared_code.worker_utils import create_user_email_queue, create_user_spam_queue, MAIN_WORKER_NAME
 from shared_code.imap_sync import create_search_from_str, gather_emails_GUIDs, download_message_by_guid, parse_message
 from shared_code.name_utils import create_user_spam_queue_name, create_email_worker_celery_name, create_spam_worker_celery_name
 from .models import MessageModel
 
-
-"""
-    Shedule periodic task to check if user has reports to generate
-    If not kill user spam and email workers
-
-    Run every 5 minutes
-
-    Kill workers if:
-        1. Spam queue is empty
-        2. Email queue is empty
-        3. There are no new generate report tasks for user
-"""
 
 retry_policy = {'max_retries': 30,
                 'interval_start': 5,
@@ -123,13 +111,29 @@ def queue_task(sender, instance, created, **kwargs):
                 retry_policy=retry_policy)
 
 
+@shared_task
 def delete_workers():
+        """
+        Shedule periodic task to check if user has reports to generate
+        If not kill user spam and email workers
+
+        Run every 10 minutes
+
+        Kill workers if:
+            1. Spam queue is empty
+            2. Email queue is empty
+            3. There are no new generate report tasks for user
+        """
+
         main_inspect = app.control.inspect([MAIN_WORKER_NAME])
+
         for user in get_user_model().objects.all():
             spam_worker_name = create_spam_worker_celery_name(user.id)
+
             email_worker_name = create_email_worker_celery_name(user.id)
 
             spam_inspect = app.control.inspect([spam_worker_name])
+
             email_inspect = app.control.inspect([email_worker_name])
 
             main_tasks = main_inspect.active().get(
@@ -141,8 +145,9 @@ def delete_workers():
                 is_proceeding = False
 
                 for task in main_tasks:
-                    if task['args'][0] == user.id:
-                        is_proceeding = True
+                    if len(task['args']) > 0:
+                        if task['args'][0] == user.id:
+                            is_proceeding = True
                         break
 
                 if is_proceeding:
