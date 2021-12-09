@@ -1,5 +1,5 @@
 from pathlib import Path
-
+import os
 # GENERAL
 # ------------------------------------------------------------------------------
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -181,4 +181,6 @@ ACCOUNT_UNIQUE_EMAIL = True
 # Celery rabbitMQ
 # ------------------------------------------------------------------------------
 # https://docs.celeryproject.org/en/latest/getting-started/backends-and-brokers/rabbitmq.html#setting-up-rabbitmq
-CELERY_BROKER_URL = 'amqp://myuser:mypassword@localhost:5672/myvhost'
+# CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672'
+CELERY_BROKER_URL = 'amqp://full_access:987kjioiasdjXPIOJKOIJ981279183712@localhost:5672'
+# CELERY_BROKER_URL = 'amqp://user:pass@message_broker:5672/vhost'

@@ -3,26 +3,16 @@ import logging
 from celery import shared_task
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.contrib.auth import get_user_model
+from config.celery import app
 from shared_code.aiospamc_utils import create_report
 from shared_code.queries import get_report_by_id_and_owner, create_message_evaluation
 from shared_code.queries import create_message as save_message_to_db
-from shared_code.worker_utils import create_user_email_queue, create_user_spam_queue
+from shared_code.worker_utils import create_user_email_queue, create_user_spam_queue, MAIN_WORKER_NAME
 from shared_code.imap_sync import create_search_from_str, gather_emails_GUIDs, download_message_by_guid, parse_message
-from shared_code.name_utils import create_user_spam_queue_name
+from shared_code.name_utils import create_user_spam_queue_name, create_email_worker_celery_name, create_spam_worker_celery_name
 from .models import MessageModel
 
-
-"""
-    Shedule periodic task to check if user has reports to generate
-    If not kill user spam and email workers
-
-    Run every 5 minutes
-
-    Kill workers if:
-        1. Spam queue is empty
-        2. Email queue is empty
-        3. There are no new generate report tasks for user
-"""
 
 retry_policy = {'max_retries': 30,
                 'interval_start': 5,
@@ -37,12 +27,14 @@ def download_email_task(
             mailbox_credentials,
             guid=email_guid)
 
+        if not message:
+            raise LookupError('Message not found')
+
         message = parse_message(message)
 
     except Exception as e:
         """ Because of hard to predict errors in imap-tools, retry on every Exception
         """
-        logging.error(e)
         raise self.retry(exc=e)
 
     save_message_to_db(
@@ -117,3 +109,77 @@ def queue_task(sender, instance, created, **kwargs):
         args=[message, int(instance.id)],
         queue=spam_queue, retry=True,
                 retry_policy=retry_policy)
+
+
+@shared_task
+def delete_workers():
+        """
+        Shedule periodic task to check if user has reports to generate
+        If not kill user spam and email workers
+
+        Run every 10 minutes
+
+        Kill workers if:
+            1. Spam queue is empty
+            2. Email queue is empty
+            3. There are no new generate report tasks for user
+        """
+
+        main_inspect = app.control.inspect([MAIN_WORKER_NAME])
+
+        for user in get_user_model().objects.all():
+            spam_worker_name = create_spam_worker_celery_name(user.id)
+
+            email_worker_name = create_email_worker_celery_name(user.id)
+
+            spam_inspect = app.control.inspect([spam_worker_name])
+
+            email_inspect = app.control.inspect([email_worker_name])
+
+            main_tasks = main_inspect.active().get(
+                MAIN_WORKER_NAME) + main_inspect.reserved().get(MAIN_WORKER_NAME)
+
+            if main_tasks:
+                """ If main queue is proceeding any user task, skip workers deleting
+                """
+                is_proceeding = False
+
+                for task in main_tasks:
+                    if len(task['args']) > 0:
+                        if task['args'][0] == user.id:
+                            is_proceeding = True
+                        break
+
+                if is_proceeding:
+                    continue
+
+            if not spam_inspect.ping() or not email_inspect.ping():
+                """ If workers are not found, skip workers deleting
+                """
+                continue
+
+            if spam_inspect.active().get(spam_worker_name):
+                """ If user spam queue is proceeding any task, skip workers deleting
+                """
+                continue
+
+            if spam_inspect.reserved().get(spam_worker_name):
+                """ If user spam queue is not empty, skip workers deleting
+                """
+                continue
+
+            if email_inspect.active().get(email_worker_name):
+                """ If user email queue is proceeding any task, skip workers deleting
+                """
+                continue
+
+            if email_inspect.reserved().get(email_worker_name):
+                """ If user email queue is not empty, skip workers deleting
+                """
+                continue
+
+            app.control.broadcast(
+                'shutdown',
+                destination=[
+                    spam_worker_name,
+                    email_worker_name])

@@ -13,3 +13,9 @@ media
 
 # PID files #
 *.pid
+
+# Celery-beat schedule file #
+celerybeat-schedule
+
+# Supervisord #
+supervisord.log

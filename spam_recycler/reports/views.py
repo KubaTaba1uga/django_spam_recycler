@@ -2,9 +2,11 @@ from django.http.response import Http404, HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.views import generic
 from django.urls import reverse_lazy
+from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from mailboxes.mixins import PassLoggedUserToFormMixin
 from shared_code.imap_sync import get_mailbox_folder_list, validate_credentials, validate_folder_list
+from shared_code.name_utils import create_email_worker_celery_name, create_email_worker_name, create_spam_worker_celery_name, create_spam_worker_name, create_worker_celery_name
 from shared_code.queries import (
     count_messages_evaluations_in_report,
      count_messages_in_report,
@@ -222,3 +224,68 @@ class MessageSpamEvaluationShowView(LoginRequiredMixin, ValidateReportOwnerOrGue
             return HttpResponse(spam_evaluation.spam_description, content_type='text/plain')
         else:
             raise Http404
+
+from config.celery import app
+
+
+class DeleteWorkerTestView(generic.View):
+    MAIN_WORKER_NAME = create_worker_celery_name('main_worker')
+
+    def get(self, request, *args, **kwargs):
+        main_inspect = app.control.inspect([self.MAIN_WORKER_NAME])
+        for user in get_user_model().objects.all():
+            spam_worker_name = create_spam_worker_celery_name(user.id)
+            email_worker_name = create_email_worker_celery_name(user.id)
+
+            spam_inspect = app.control.inspect([spam_worker_name])
+            email_inspect = app.control.inspect([email_worker_name])
+
+            main_tasks = main_inspect.active().get(
+                self.MAIN_WORKER_NAME) + main_inspect.reserved().get(self.MAIN_WORKER_NAME)
+
+            if main_tasks:
+                """ If main queue is proceeding any user task, skip workers deleting
+                """
+                is_proceeding = False
+
+                for task in main_tasks:
+                    if len(task['args']) > 0:
+                        if task['args'][0] == user.id:
+                            is_proceeding = True
+                        break
+
+                if is_proceeding:
+                    continue
+
+            if not spam_inspect.ping() or not email_inspect.ping():
+                """ If workers are not found, skip workers deleting
+                """
+                continue
+
+            if spam_inspect.active().get(spam_worker_name):
+                """ If user spam queue is proceeding any task, skip workers deleting
+                """
+                continue
+
+            if spam_inspect.reserved().get(spam_worker_name):
+                """ If user spam queue is not empty, skip workers deleting
+                """
+                continue
+
+            if email_inspect.active().get(email_worker_name):
+                """ If user email queue is proceeding any task, skip workers deleting
+                """
+                continue
+
+            if email_inspect.reserved().get(email_worker_name):
+                """ If user email queue is not empty, skip workers deleting
+                """
+                continue
+
+            app.control.broadcast(
+                'shutdown',
+                destination=[
+                    spam_worker_name,
+                    email_worker_name])
+
+        return HttpResponse(f"active_tasks:\nreserved_tasls:")
