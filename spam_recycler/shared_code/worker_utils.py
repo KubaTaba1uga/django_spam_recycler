@@ -1,14 +1,12 @@
 from shared_code.name_utils import (
     create_user_spam_queue_name,
      create_user_email_queue_name,
-     create_spam_worker_name,
-     create_email_worker_name,
      create_worker_celery_name)
 from subprocess import Popen, PIPE
 
-SCRIPT_PATH = './scripts/set_up_user_queues.py'
+SCRIPT_PATH = '/code/scripts/set_up_user_queues.py'
 
-COMMAND_EXEC = 'poetry run python'
+COMMAND_EXEC = 'python'
 
 MAIN_WORKER_NAME = create_worker_celery_name('main_worker')
 

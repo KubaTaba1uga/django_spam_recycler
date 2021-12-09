@@ -42,5 +42,5 @@ def debug_task(self):
 
 app.conf.beat_schedule = {'cleanup-workers': {
     'task': 'reports.tasks.delete_workers',
-        'schedule': timedelta(minutes=1),
+        'schedule': timedelta(minutes=10),
 }}
