@@ -182,6 +182,5 @@ ACCOUNT_UNIQUE_EMAIL = True
 # ------------------------------------------------------------------------------
 # https://docs.celeryproject.org/en/latest/getting-started/backends-and-brokers/rabbitmq.html#setting-up-rabbitmq
 # CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672'
-CELERY_BROKER_URL = 'amqp://full_access:987kjioiasdj<><><>@rabbitmq:5672'
-# CELERY_BROKER_URL =
-# 'amqp://full_access:987kjioiasdj<><><>@message_broker:5672'
+CELERY_BROKER_URL = 'amqp://full_access:987kjioiasdj<><><>@localhost:5672'
+# CELERY_BROKER_URL = 'amqp://user:pass@message_broker:5672/vhost'

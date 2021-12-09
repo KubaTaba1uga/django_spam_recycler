@@ -2,13 +2,13 @@ version: '3.8'
 
 services:
   
-  web:
-    build: .
-    command: python /code/manage.py runserver 0.0.0.0:8000
-    volumes:
-      - .:/code
-    ports:
-      - 8000:8000
+  # web:
+  #   build: .
+  #   command: python /code/spam_recycler/manage.py runserver 0.0.0.0:8000
+  #   volumes:
+  #     - .:/code
+  #   ports:
+  #     - 8000:8000
   
   db:
     container_name: "database"
@@ -19,18 +19,21 @@ services:
       - "POSTGRES_HOST_AUTH_METHOD=trust"
   
   rabbitmq:
-    container_name: "message_broker"
+
+    container_name: "rabbitmq"
+    
     image: rabbitmq:3.9.11-management
-    environment:
-      # HTTP management UI credentials
-      - RABBITMQ_DEFAULT_USER=$RABBITMQ_USER
-      - RABBITMQ_DEFAULT_PASS=$RABBITMQ_PASSWORD
-      - RABBITMQ_DEFAULT_VHOST=$RABBITMQ_VHOST"/"
+    
     ports:
       # AMQP protocol port
       - '5672:5672'
       # HTTP management UI port
       - '15672:15672'
+    
+    volumes:
+      # Users/Password/Vhosts configuration files
+      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
     
 volumes:
   postgres_data:

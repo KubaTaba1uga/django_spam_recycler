@@ -7,7 +7,6 @@ ENV PYTHONUNBUFFERED 1
 
 # Set work directory
 WORKDIR /code
-# ENV PYTHONPATH=${PYTHONPATH}:${PWD}
 
 # Install dependencies
 RUN pip3 install poetry
