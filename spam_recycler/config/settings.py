@@ -5,11 +5,11 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 # https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-SECRET_KEY
-SECRET_KEY = '43)%4yx)aa@a=+_c(fn&kf3g29xax+=+a&key9i=!98zyim=8j'
+SECRET_KEY = os.environ.get("SECRET_KEY")
 # https://docs.djangoproject.com/en/dev/ref/settings/#debug
-DEBUG = True
+DEBUG = int(os.environ.get("DEBUG", default=0))
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1"]
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ")
 
 # APPS
 # ------------------------------------------------------------------------------
@@ -82,9 +82,13 @@ TEMPLATES = [
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
+        "NAME": os.environ.get("POSTGRES_DB", BASE_DIR / "db.sqlite3"),
+        "USER": os.environ.get("POSTGRES_USER", "user"),
+        "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "password"),
+        "HOST": os.environ.get("POSTGRES_HOST", "localhost"),
+        "PORT": os.environ.get("POSTGRES_PORT", "5432"),
     }
 }
 
@@ -185,4 +189,3 @@ RABBITMQ_USERNAME = os.environ.get('RABBITMQ_USER')
 RABBITMQ_PASSWORD = os.environ.get('RABBITMQ_PASS')
 RABBITMQ_VHOST = os.environ.get('RABBITMQ_VHOST')
 CELERY_BROKER_URL = f'amqp://{RABBITMQ_USERNAME}:{RABBITMQ_PASSWORD}@rabbitmq:5672{RABBITMQ_VHOST}'
-# CELERY_BROKER_URL = 'amqp://user:pass@message_broker:5672/vhost'

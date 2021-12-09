@@ -2,7 +2,7 @@ import aiospamc
 import codecs
 import re
 
-PORT = 9000
+PORT = 783
 
 async def check_for_spam(message):
     # https://aiospamc.readthedocs.io/en/latest/protocol.html?highlight=threshold#report-request
