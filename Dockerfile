@@ -7,6 +7,8 @@ ENV PYTHONUNBUFFERED 1
 
 # Set work directory
 WORKDIR /code
+# Set pythonpath for celery
+ENV PYTHONPATH "${PYTHONPATH}:/code"
 
 # Install dependencies
 RUN pip3 install poetry
@@ -14,6 +16,11 @@ RUN poetry config virtualenvs.create false
 COPY pyproject.toml /code/
 RUN poetry install --no-dev
 
-
 # Copy project
-COPY . /code/
+COPY ./spam_recycler /code/
+
+# Install supervisor
+RUN apt-get update && apt-get install supervisor -y
+
+# Install spamd
+RUN apt-get install spamassassin -y

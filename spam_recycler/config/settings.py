@@ -181,6 +181,8 @@ ACCOUNT_UNIQUE_EMAIL = True
 # Celery rabbitMQ
 # ------------------------------------------------------------------------------
 # https://docs.celeryproject.org/en/latest/getting-started/backends-and-brokers/rabbitmq.html#setting-up-rabbitmq
-# CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672'
-CELERY_BROKER_URL = 'amqp://full_access:987kjioiasdjXPIOJKOIJ981279183712@localhost:5672'
+RABBITMQ_USERNAME = os.environ.get('RABBITMQ_USER')
+RABBITMQ_PASSWORD = os.environ.get('RABBITMQ_PASS')
+RABBITMQ_VHOST = os.environ.get('RABBITMQ_VHOST')
+CELERY_BROKER_URL = f'amqp://{RABBITMQ_USERNAME}:{RABBITMQ_PASSWORD}@rabbitmq:5672{RABBITMQ_VHOST}'
 # CELERY_BROKER_URL = 'amqp://user:pass@message_broker:5672/vhost'

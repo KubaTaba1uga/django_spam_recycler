@@ -2,21 +2,40 @@ version: '3.8'
 
 services:
   
-  # web:
-  #   build: .
-  #   command: python /code/spam_recycler/manage.py runserver 0.0.0.0:8000
-  #   volumes:
-  #     - .:/code
-  #   ports:
-  #     - 8000:8000
-  
+  web-app:
+
+    build: .
+    
+    command: supervisord -c /code/supervisor.conf
+    
+    ports:
+      # App
+      - 8000:8000
+      # Flower
+      - 5000:5000
+    
+    environment:
+      - RABBITMQ_USER=${RABBITMQ_USER}
+      - RABBITMQ_PASS=${RABBITMQ_PASSWORD}
+      - RABBITMQ_VHOST=${RABBITMQ_VHOST}
+    
+    depends_on:
+      - rabbitmq
+      
   db:
+    
     container_name: "database"
+    
     image: postgres:11
+    
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+    
     environment:
-      - "POSTGRES_HOST_AUTH_METHOD=trust"
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    
+    depends_on:
+      - web-app
   
   rabbitmq:
 
@@ -36,7 +55,7 @@ services:
       - RABBITMQ_DEFAULT_VHOST=${RABBITMQ_VHOST}
       
     volumes:
-      # Users/Password/Vhosts configuration files
+      # Users/Password/Vhosts configuration file
       - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
     
 volumes:
