@@ -14,6 +14,7 @@
 - Spamd Client [aiospamc] (https://pypi.org/project/aiospamc/)
 - Task Managing [celery] (https://pypi.org/project/celery/)
 - Task Storage [redis] (https://pypi.org/project/redis/)
+- Spamassasin container [<a href="https://github.com/dinkel">dinkel</a>] https://github.com/dinkel/docker-spamassassin
 
 ----
 
@@ -28,8 +29,6 @@ TO-DO
 
 ## Table of Contents
 * **[Installation](#installation)**
-  * [Pip](#pip)
-  * [Pipenv](#pipenv)
   * [Docker](#docker)
 * [Setup](#setup)
 * [Contributing](#contributing)
