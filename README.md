@@ -8,7 +8,7 @@
 ## 🚀 Features
 
 - Django 3.2 & Python 3.9
-- Install via [Pip](https://pypi.org/project/pip/), [Poetry](https://pypi.org/project/poetry/), or [Docker](https://www.docker.com/)
+- Install via [Poetry](https://pypi.org/project/poetry/) and [Docker](https://www.docker.com/)
 - User log in/out, sign up, password reset via [django-allauth](https://github.com/pennersr/django-allauth)
 - Static files configured with [Whitenoise](http://whitenoise.evans.io/en/stable/index.html)
 - Styling with [Bootstrap v4](https://github.com/twbs/bootstrap)
@@ -20,42 +20,20 @@
 ----
 
 ## 📖 Installation
-Spam Segregator can be installed via Pip, Poetry, or Docker depending upon your setup. To start, clone the repo to your local computer and change into the proper directory.
+Spam Segregator can be installed via Docker. To start, clone the repo to your local computer and change into the proper directory.
 
 ```
-$ git clone https://github.com/wsvincent/djangox.git
-$ cd djangox
-```
-
-### Pip
-
-```
-$ python3 -m venv djangox
-$ source djangox/bin/activate
-(djangox) $ pip install -r requirements.txt
-(djangox) $ python manage.py migrate
-(djangox) $ python manage.py createsuperuser
-(djangox) $ python manage.py runserver
-# Load the site at http://127.0.0.1:8000
-```
-
-### Pipenv
-
-```
-$ pipenv install
-$ pipenv shell
-(djangox) $ python manage.py migrate
-(djangox) $ python manage.py createsuperuser
-(djangox) $ python manage.py runserver
-# Load the site at http://127.0.0.1:8000
+$ git clone https://github.com/KubaTaba1uga/spam_segregator.git
+$ cd spam_segregator
 ```
 
 ### Docker
 
 ```
-$ docker build .
 $ docker-compose up -d
-$ docker-compose exec web python manage.py migrate
+# Run Migrations
+$ docker-compose exec web-app python manage.py migrate
+# Create a Superuser
 $ docker-compose exec web python manage.py createsuperuser
 # Load the site at http://127.0.0.1:8000
 ```
@@ -112,9 +90,4 @@ $ docker-compose run --rm web pytest
 $ docker-compose run --rm web pip-compile requirements/requirements.in
 ```-->
 
-<!-- ## Next Steps
 
-- Use [PostgreSQL locally via Docker](https://wsvincent.com/django-docker-postgresql/)
-- Use [django-environ](https://github.com/joke2k/django-environ) for environment variables
-- Update [EMAIL_BACKEND](https://docs.djangoproject.com/en/3.0/topics/email/#module-django.core.mail) to configure an SMTP backend
-- Make the [admin more secure](https://opensource.com/article/18/1/10-tips-making-django-admin-more-secure)
