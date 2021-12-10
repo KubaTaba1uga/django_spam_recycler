@@ -15,6 +15,7 @@ django-crispy-forms = "1.10.0"
 imap-tools = "^0.50.1"
 flower = "^1.0.0"
 django-debug-toolbar = "3.2"
+psycopg2-binary = "^2.9.2"
 
 
 [tool.poetry.dev-dependencies]

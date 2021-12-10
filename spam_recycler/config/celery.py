@@ -28,18 +28,6 @@ app.conf.task_create_missing_queues = True
 from time import sleep
 
 
-@app.task(bind=True)
-def debug_task(self):
-    sleep(10)
-    print(f'DONE')
-
-""" Start flower
-        $  celery --broker=amqp://myuser:mypassword@localhost:5672/myvhost flower --port=5000
-    Start worker
-        $  celery -A config worker -l info
-
-"""
-
 app.conf.beat_schedule = {'cleanup-workers': {
     'task': 'reports.tasks.delete_workers',
         'schedule': timedelta(minutes=10),

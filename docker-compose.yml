@@ -3,11 +3,8 @@ version: '3.8'
 services:
   
   web-app:
-
     build: .
-    
     command: supervisord -c /code/supervisor.conf
-    
     ports:
       # App
       - 8000:8000
@@ -15,28 +12,39 @@ services:
       - 5000:5000
     
     environment:
+      # RabbitMQ credentials
       - RABBITMQ_USER=${RABBITMQ_USER}
       - RABBITMQ_PASS=${RABBITMQ_PASSWORD}
       - RABBITMQ_VHOST=${RABBITMQ_VHOST}
+      # Django settings
+      - SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DEBUG=${DJANGO_DEBUG}
+      - ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS}
+      # Postgres credentials
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+
     
     depends_on:
       - rabbitmq
-      
+
   db:
-    
-    container_name: "database"
-    
-    image: postgres:11
+    container_name: "db"
+
+    image: postgres:13-bullseye
     
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     
     environment:
-      - POSTGRES_HOST_AUTH_METHOD=trust
-    
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+
     depends_on:
       - web-app
-  
+
   rabbitmq:
 
     container_name: "rabbitmq"
