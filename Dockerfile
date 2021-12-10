@@ -24,5 +24,5 @@ COPY pyproject.toml /code/
 RUN poetry install --no-dev
 
 # Copy project
-COPY ./spam_recycler /code/
+COPY ./app /code/
 

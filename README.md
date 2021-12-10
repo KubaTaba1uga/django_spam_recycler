@@ -14,7 +14,6 @@
 - Spamd Client [aiospamc] (https://pypi.org/project/aiospamc/)
 - Task Managing [celery] (https://pypi.org/project/celery/)
 - Task Storage [redis] (https://pypi.org/project/redis/)
-- Spamassasin container [<a href="https://github.com/dinkel">dinkel</a>] https://github.com/dinkel/docker-spamassassin
 
 ----
 
@@ -71,10 +70,10 @@ $ pipenv shell
 ### Docker
 
 ```
-$ docker build .
+$ docker-compose build 
 $ docker-compose up -d
-$ docker-compose exec web python manage.py migrate
-$ docker-compose exec web python manage.py createsuperuser
+$ docker-compose exec web-app python manage.py migrate
+$ docker-compose exec web-app python manage.py createsuperuser
 # Load the site at http://127.0.0.1:8000
 ```
 
