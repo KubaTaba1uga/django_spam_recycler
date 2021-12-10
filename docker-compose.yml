@@ -17,23 +17,27 @@ services:
       - RABBITMQ_PASS=${RABBITMQ_PASSWORD}
       - RABBITMQ_VHOST=${RABBITMQ_VHOST}
       # Django settings
-      - SECRET_KEY=${DJANGO_SECRET_KEY}
-      - DEBUG=${DJANGO_DEBUG}
-      - ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS}
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG=${DEBUG}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
       # Postgres credentials
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
-
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      # Spamassasin
+      - SPAMASSASIN_HOST=${SPAMASSASIN_HOST}
+      - SPAMASSASIN_PORT=${SPAMASSASIN_PORT}
     
     depends_on:
       - rabbitmq
+      - postgres
+      - spamassasin
 
   db:
     container_name: "db"
-
     image: postgres:13-bullseye
-    
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     
@@ -42,15 +46,24 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
 
-    depends_on:
-      - web-app
+  
+  spamassasin:
+    container_name: "spamassasin"
+    build:
+      context: ./spamassasin
+      dockerfile: Dockerfile
+    
+    ports:
+      # SPAMD protocol port
+      - '9000:9000'
+    environment:
+      - HOST=${SPAMASSASIN_HOST}
+      - PORT=${SPAMASSASIN_PORT}
+
 
   rabbitmq:
-
     container_name: "rabbitmq"
-    
     image: rabbitmq:3.9.11-management
-    
     ports:
       # AMQP protocol port
       - '5672:5672'

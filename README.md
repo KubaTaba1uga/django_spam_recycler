@@ -16,6 +16,18 @@
 - Imap Client [imap-tools] (https://pypi.org/project/imap-tools/)
 - Spamd Client [aiospamc] (https://pypi.org/project/aiospamc/)
 - Task Managing [celery] (https://pypi.org/project/celery/)
+- Spamassasin container [<a href="https://github.com/dinkel">dinkel</a>] https://github.com/dinkel/docker-spamassassin
+
+----
+
+## Table of Contents
+* **[Installation](#installation)**
+  * [Docker](#docker)
+* [Setup](#setup)
+* [Contributing](#contributing)
+* [Support](#support)
+* [License](#license)
+
 
 ----
 

@@ -1,17 +1,21 @@
 import aiospamc
 import codecs
 import re
+import os
 
-PORT = 783
+PORT = os.environ.get('SPAMASSASIN_PORT', '783')
+HOST = os.environ.get('SPAMASSASIN_HOST', 'localhost')
+
+CONFIG = {'port': PORT, 'host': HOST}
 
 async def check_for_spam(message):
     # https://aiospamc.readthedocs.io/en/latest/protocol.html?highlight=threshold#report-request
-    return await aiospamc.check(message=message, port=PORT)
+    return await aiospamc.check(message=message, **CONFIG)
 
 
 async def report_for_spam(message):
     # https://aiospamc.readthedocs.io/en/latest/protocol.html?highlight=threshold#report-request
-    return await aiospamc.report(message=message, port=PORT)
+    return await aiospamc.report(message=message, **CONFIG)
 
 
 def format_report(report):
