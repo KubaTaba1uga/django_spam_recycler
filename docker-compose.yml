@@ -44,6 +44,9 @@ services:
 
     depends_on:
       - web-app
+  
+  spamassasin:
+    dockerfile: ./spamassasin/Dockerfile
 
   rabbitmq:
 
