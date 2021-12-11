@@ -25,7 +25,7 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 app.conf.task_create_missing_queues = True
 
 
-app.conf.beat_schedule = {'cleanup-workers': {
-    'task': 'shared_code.worker_utils.delete_workers',
-        'schedule': timedelta(hours=24),
-}}
+# app.conf.beat_schedule = {'cleanup-workers': {
+#     'task': 'shared_code.worker_utils.delete_workers',
+#         'schedule': timedelta(hours=24),
+# }}

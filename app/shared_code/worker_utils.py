@@ -43,7 +43,6 @@ def create_user_email_queue(user_id):
     return queue_name
 
 
-@shared_task
 def delete_workers():
         """
         Shedule periodic task to check if user has reports to generate

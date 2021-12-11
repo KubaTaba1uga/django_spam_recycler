@@ -3,10 +3,10 @@ from subprocess import Popen, PIPE, CalledProcessError
 import json
 
 PIDFILES_FOLDER = '/code/scripts/pid_locks/'
-
 """ Store pidfiles on disk to avoid multiple
         workers with the same name
 """
+LOGFILES_FOLDER = '/code/scripts/logs/'
 
 
 def unpack_json(json_string):
@@ -79,7 +79,7 @@ def create_worker(worker_name):
     Creates a worker on the celery
     """
 
-    COMMAND = f'celery -A config worker -n {worker_name} -c 1 --detach --pidfile {PIDFILES_FOLDER}{worker_name}.pid'
+    COMMAND = f'celery -A config worker -l debug -n {worker_name} -c 1 --detach --pidfile {PIDFILES_FOLDER}{worker_name}.pid -f {LOGFILES_FOLDER}{worker_name}.log'
 
     worker_creation = execute_command(COMMAND)
 
