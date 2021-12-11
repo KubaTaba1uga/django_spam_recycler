@@ -25,10 +25,7 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 app.conf.task_create_missing_queues = True
 
 
-from time import sleep
-
-
 app.conf.beat_schedule = {'cleanup-workers': {
-    'task': 'reports.tasks.delete_workers',
-        'schedule': timedelta(minutes=10),
+    'task': 'shared_code.worker_utils.delete_workers',
+        'schedule': timedelta(hours=24),
 }}
