@@ -35,33 +35,22 @@ from .models import MessageModel
 
 
 #@shared_task(bind=True, base=BaseTaskWithRetry)
-@shared_task(autoretry_for=(MailboxLoginError,))
+@shared_task(bind=True, default_retry_delay=30, max_retries=3)
 def download_email_task(
-        email_guid, mailbox_credentials, folder, report_id):
-        # self, email_guid, mailbox_credentials, folder, report_id):
+        self, email_guid, mailbox_credentials, folder, report_id):
 
-    message = download_message_by_guid(
-        mailbox_credentials,
-        guid=email_guid)
+    try:
+        message = download_message_by_guid(
+            mailbox_credentials,
+            guid=email_guid)
+    except MailboxLoginError as e:
+        self.retry()
 
     if not message:
-            """ If message cannot be downloaded,
-                    try to download it again 4 times.
-                    If it still cannot be downloaded,
-                    deacrease number of messages in report
-            """
-        # if self.request.retries == 5:
-            report = get_report_by_id(report_id)
-            report.messages_counter -= 1
-            report.save()
-            # return "Messagre {} for report {} cannot be
-            # downloaded".format(email_guid, report_id)
+        self.retry()
 
-        # else:
-        #     raise Exception('Message not found')
     else:
         message = parse_message(message)
-
         save_message_to_db(
             message['subject'],
             message['sender'],
@@ -72,6 +61,24 @@ def download_email_task(
             folder,
             report_id,
         )
+
+    # if not message:
+    #         """ If message cannot be downloaded,
+    #                 try to download it again 4 times.
+    #                 If it still cannot be downloaded,
+    #                 deacrease number of messages in report
+    #         """
+    # if self.request.retries == 5:
+    #         report = get_report_by_id(report_id)
+    #         report.messages_counter -= 1
+    #         report.save()
+    # return "Messagre {} for report {} cannot be
+    # downloaded".format(email_guid, report_id)
+
+    # else:
+    # raise Exception('Message not found')
+    # else:
+    #
 
         # return "Message {} for report {} has been
         # downloaded".format(email_guid, report_id)
