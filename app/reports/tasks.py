@@ -1,6 +1,6 @@
 import asyncio
 from imap_tools.errors import MailboxLoginError
-from celery import shared_task, Task
+from celery import shared_task
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from config.celery import app
@@ -13,7 +13,7 @@ from shared_code.name_utils import create_user_spam_queue_name
 from .models import MessageModel
 
 
-@shared_task(bind=True, default_retry_delay=5)
+@shared_task(bind=True, default_retry_delay=5, max_retries=None)
 def download_email_task(
         self, email_guid, mailbox_credentials, folder, report_id):
     """ If email downloading fail 100 times
@@ -24,7 +24,7 @@ def download_email_task(
         report = get_report_by_id(report_id)
         report.messages_counter -= 1
         report.save()
-        return "Messagre {} for report {} cannot be downloaded".format(email_guid, report_id)
+        return "Message {} for report {} cannot be downloaded".format(email_guid, report_id)
 
     try:
         message = download_message_by_guid(
@@ -32,9 +32,10 @@ def download_email_task(
             guid=email_guid)
 
     except MailboxLoginError:
-        # Error thrown randomly by for example
-        #   imap.gmail.com even when credentials
-        #   are valid
+        # Error thrown by imap_tools in case of collision
+        #   when multiple apps try to login to the same mailbox.
+        #   Even if credentials are correct
+        #   imap.gmail.com return "NO" in place of "OK"
 
         self.retry()
 
@@ -65,13 +66,6 @@ def download_email_task(
 @shared_task
 def generate_report_task(
         user_id, folder_list, start_date, end_date, mailbox_credentials, report_id):
-    """
-    Generate spam evaluation report for user with user_id
-
-    Set up worker and queue for email downloading
-    Set up worker and queue for email spam capability evaluation
-
-    """
 
     email_queue = create_user_email_queue(user_id)
 
@@ -110,7 +104,8 @@ def evaluate_message_spam(message, message_id):
 
 @receiver(post_save, sender=MessageModel)
 def queue_task(sender, instance, created, **kwargs):
-    """ Evaluate message spam when message is saved to db
+    """ Evaluate message spam capability
+         when message is saved to db
     """
     user_id = instance.report.mailbox.owner.id
 
@@ -124,6 +119,5 @@ def queue_task(sender, instance, created, **kwargs):
 
 
 app.task(delete_workers)
-""" Include task from shared_code.worker_utils.delete_workers
-        as dynamic workers deleting is used, upon report creation
-"""
+# Include task from shared_code.worker_utils.delete_workers
+#   as dynamic workers deleting is used, upon report creation

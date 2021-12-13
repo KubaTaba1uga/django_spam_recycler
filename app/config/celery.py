@@ -24,8 +24,10 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 # create queues if they are not exsisting
 app.conf.task_create_missing_queues = True
 
-
-# app.conf.beat_schedule = {'cleanup-workers': {
-#     'task': 'shared_code.worker_utils.delete_workers',
-#         'schedule': timedelta(hours=24),
-# }}
+# Delete workers if they queues are empty
+#  as each report should generate in less than 24 hours
+#  we can delete workers in 24 hours period
+app.conf.beat_schedule = {'cleanup-workers': {
+    'task': 'shared_code.worker_utils.delete_workers',
+        'schedule': timedelta(hours=24),
+}}

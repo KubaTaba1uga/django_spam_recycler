@@ -1,3 +1,7 @@
+@font-face {
+  font-family: myFirstFont;
+  src: url(Cyberpunk.ttf);
+}
 /* Sticky footer styles
 -------------------------------------------------- */
 html {

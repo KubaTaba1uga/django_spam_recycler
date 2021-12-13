@@ -3,9 +3,8 @@ from subprocess import Popen, PIPE, CalledProcessError
 import json
 
 PIDFILES_FOLDER = '/code/scripts/pid_locks/'
-""" Store pidfiles on disk to avoid multiple
-        workers with the same name
-"""
+# Store pidfiles on disk to avoid multiple
+#    workers with the same name
 LOGFILES_FOLDER = '/code/scripts/logs/'
 
 
@@ -127,18 +126,16 @@ def main(worker_name, spam_queue_name):
         main(worker_name, spam_queue_name)
 
     for queue in get_worker_queues(worker_name):
-        """
-        Unconsume all queues beside user's spam_queue
-        """
+        # Unconsume all queues beside user's spam_queue
+
         if queue['name'] != spam_queue_name:
 
             unconsume_queue_by_worker(worker_celery_name, queue['name'])
 
         else:
+            # Add spam_queue only if it is not already being consumed
             return
-    """
-    Add spam_queue only if it is not already being consumed
-    """
+
     consume_queue_by_worker(worker_celery_name, spam_queue_name)
 
 
