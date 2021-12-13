@@ -1,8 +1,5 @@
 import asyncio
-import logging
-from socket import gaierror
 from imap_tools.errors import MailboxLoginError
-import imaplib
 from celery import shared_task, Task
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -16,41 +13,41 @@ from shared_code.name_utils import create_user_spam_queue_name
 from .models import MessageModel
 
 
-# class BaseTaskWithRetry(Task):
-#     autoretry_for = (
-#         gaierror,
-#         Exception,
-#      MailboxLoginError,
-#      imaplib.IMAP4.error)
-#     retry_kwargs = {'max_retries': 6}
-#     retry_backoff = 5
-#     retry_jitter = True
-#     reject_on_worker_lost = True
-
-    # Idea:
-    #   create worker on failre
-    # def on_failure(self, exc, task_id, args, kwargs, einfo):
-    #     create_user_email_queue
-    #     return super().on_failure(exc, task_id, args, kwargs, einfo)
-
-
-#@shared_task(bind=True, base=BaseTaskWithRetry)
-@shared_task(bind=True, default_retry_delay=30, max_retries=3)
+@shared_task(bind=True, default_retry_delay=5)
 def download_email_task(
         self, email_guid, mailbox_credentials, folder, report_id):
+    """ If email downloading fail 100 times
+            deascrease number of messages in report
+            by 1
+    """
+    if self.request.retries == 100:
+        report = get_report_by_id(report_id)
+        report.messages_counter -= 1
+        report.save()
+        return "Messagre {} for report {} cannot be downloaded".format(email_guid, report_id)
 
     try:
         message = download_message_by_guid(
             mailbox_credentials,
             guid=email_guid)
-    except MailboxLoginError as e:
+
+    except MailboxLoginError:
+        # Error thrown randomly by for example
+        #   imap.gmail.com even when credentials
+        #   are valid
+
         self.retry()
 
     if not message:
+        # imap_tools.mailbox.fetch sometimes
+        #  return None in place of Message object
+
         self.retry()
 
     else:
+
         message = parse_message(message)
+
         save_message_to_db(
             message['subject'],
             message['sender'],
@@ -62,29 +59,9 @@ def download_email_task(
             report_id,
         )
 
-    # if not message:
-    #         """ If message cannot be downloaded,
-    #                 try to download it again 4 times.
-    #                 If it still cannot be downloaded,
-    #                 deacrease number of messages in report
-    #         """
-    # if self.request.retries == 5:
-    #         report = get_report_by_id(report_id)
-    #         report.messages_counter -= 1
-    #         report.save()
-    # return "Messagre {} for report {} cannot be
-    # downloaded".format(email_guid, report_id)
-
-    # else:
-    # raise Exception('Message not found')
-    # else:
-    #
-
-        # return "Message {} for report {} has been
-        # downloaded".format(email_guid, report_id)
+        return "Message {} for report {} has been downloaded".format(email_guid, report_id)
 
 
-#@shared_task(base=BaseTaskWithRetry)
 @shared_task
 def generate_report_task(
         user_id, folder_list, start_date, end_date, mailbox_credentials, report_id):
