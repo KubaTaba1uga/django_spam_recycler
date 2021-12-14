@@ -10,15 +10,17 @@ from shared_code.queries import create_message as save_message_to_db
 from shared_code.worker_utils import create_user_email_queue, create_user_spam_queue, delete_workers
 from shared_code.imap_sync import create_search_from_str, gather_emails_GUIDs, download_message_by_guid, parse_message
 from shared_code.name_utils import create_user_spam_queue_name
-from .models import MessageModel
-
-# Task will retry as long as it fails
-#  because at this point all data are already validated
+from .models import MessageModel, ReportModel
 
 
 @shared_task(bind=True, default_retry_delay=5, max_retries=None)
 def download_email_task(
         self, email_guid, mailbox_credentials, folder, report_id):
+    """
+    Task will retry as long as it fails
+    because at this point all data are already validated
+    so errors are not expected
+    """
 
     try:
         message = download_message_by_guid(
@@ -29,15 +31,20 @@ def download_email_task(
         # Error thrown by imap_tools in case of collision
         #   when multiple apps try to login to the same mailbox.
         #   Even if credentials are correct
-        #   imap.gmail.com return "NO" in place of "OK"
+        #   imap.gmail.com for example:
+        #       return "NO" in place of "OK"
 
         self.retry()
 
     if not message:
-        # imap_tools.mailbox.fetch sometimes
+        # imap_tools.mailbox.fetch
         #  return None in place of Message object
+        #  if message is not found
+        #  or if it is found but it is marked as deleted
 
-        self.retry()
+        report = get_report_by_id(report_id)
+        report.messages_counter -= 1
+        report.save()
 
     else:
 
@@ -70,16 +77,18 @@ def generate_report_task(
     search = create_search_from_str(start_date, end_date)
 
     for folder in folder_list:
+
         for email_guid in gather_emails_GUIDs(mailbox_credentials=mailbox_credentials, folder=folder, search=search):
 
             download_email_task.apply_async(
                 args=[email_guid,
                       mailbox_credentials, folder, report_id],
-                queue=email_queue)
+                queue=email_queue,
+                countdown=60)
 
             report.messages_counter += 1
 
-    report.save()
+        report.save()
 
     return "Report for user {} has been generated".format(user_id)
 

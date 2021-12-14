@@ -27,6 +27,7 @@ app.conf.task_create_missing_queues = True
 # Delete workers if they queues are empty
 #  as each report should generate in less than 24 hours
 #  we can delete workers in 24 hours period
+#  This is not ideal solution, but it works
 app.conf.beat_schedule = {'cleanup-workers': {
     'task': 'shared_code.worker_utils.delete_workers',
         'schedule': timedelta(hours=24),
