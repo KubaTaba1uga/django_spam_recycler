@@ -12,19 +12,13 @@ from shared_code.imap_sync import create_search_from_str, gather_emails_GUIDs, d
 from shared_code.name_utils import create_user_spam_queue_name
 from .models import MessageModel
 
+# Task will retry as long as it fails
+#  because at this point all data are already validated
+
 
 @shared_task(bind=True, default_retry_delay=5, max_retries=None)
 def download_email_task(
         self, email_guid, mailbox_credentials, folder, report_id):
-    """ If email downloading fail 100 times
-            deascrease number of messages in report
-            by 1
-    """
-    if self.request.retries == 100:
-        report = get_report_by_id(report_id)
-        report.messages_counter -= 1
-        report.save()
-        return "Message {} for report {} cannot be downloaded".format(email_guid, report_id)
 
     try:
         message = download_message_by_guid(

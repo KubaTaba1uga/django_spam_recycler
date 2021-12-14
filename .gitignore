@@ -22,3 +22,6 @@ supervisord.log
 
 # Environment variables #
 .env
+
+# Pytest #
+.pytest_cache

@@ -1,7 +1,8 @@
-from django.test import TransactionTestCase
 from django.contrib.auth import get_user_model
-from .models import MailboxModel
+import pytest
 import os
+
+from .models import MailboxModel
 
 USER = {
     'username': 'test',
@@ -10,30 +11,35 @@ USER = {
 }
 
 MAILBOX = {
-    'email_address': os.environ.get('TEST_EMAIL_ADDRESS'),
-    'server_address': os.environ.get('TEST_SERVER_ADDRESS'),
-    'password': os.environ.get('TEST_EMAIL_PASSWORD'),
+    'email_address':
+        os.environ.get('TEST_EMAIL_ADDRESS', 'jakub.buczynski@example.com'),
+    'server_address':
+        os.environ.get('TEST_SERVER_ADDRESS', 'imap.example.com'),
+    'password': os.environ.get('TEST_EMAIL_PASSWORD', '****************'),
 }
 
 
-class MailboxModelTest(TransactionTestCase):
+@pytest.fixture
+@pytest.mark.django_db
+def create_user():
+    return get_user_model().objects.create(**USER)
 
-    def setUp(self):
-        self.user = get_user_model().objects.create(**USER)
 
-        self.mailbox = MailboxModel.objects.create(
-            owner=self.user,
-            **MAILBOX)
+@pytest.fixture
+@pytest.mark.django_db
+def create_mailbox(create_user):
+    return MailboxModel.objects.create(
+        owner=create_user,
+            email_address=MAILBOX['email_address'],
+            server_address=MAILBOX['server_address'])
 
-    def test_mailbox_creation(self):
-        self.assertTrue(
-            MailboxModel.objects.filter(owner=self.user, **MAILBOX).exists())
 
-    def test_mailbox_content(self):
-        self.assertTrue(
-            MailboxModel.objects.filter(
-                owner=self.user,
-                **MAILBOX))
+@pytest.mark.django_db
+def test_mailbox_creation(create_mailbox):
+    assert create_mailbox.email_address == MAILBOX['email_address']
+    assert create_mailbox.server_address == MAILBOX['server_address']
 
-    def test_mailbox_representation(self):
-        self.assertEqual(str(self.mailbox), MAILBOX['email_address'])
+
+@pytest.mark.django_db
+def test_mailbox_representation(create_mailbox):
+    assert str(create_mailbox) == MAILBOX['email_address']

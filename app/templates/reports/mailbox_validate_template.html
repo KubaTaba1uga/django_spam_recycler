@@ -6,8 +6,10 @@
 
 {% block content %}
 <h2>Validate Mailbox</h2>
-  <form method="post">{% csrf_token %}
+<div class="container">
+  <form method="post" class="w-35">{% csrf_token %}
     {{ form|crispy }}
     <button class="btn btn-success ml-2" type="submit">Validate</button>
   </form>
+</div>
 {% endblock content %}
