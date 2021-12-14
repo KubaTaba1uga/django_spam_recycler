@@ -1,3 +1,20 @@
+@font-face {
+  font-family: brand;
+  src: url(CyberwayRiders-lg97d.ttf);
+}
+#brand-text {
+  font-family: brand;
+  font-size: 2em;
+}
+
+.w-35 {
+  width: 35%;
+}
+
+.my-small-btn {
+  width:80px;
+  padding:5px 10px;
+}
 /* Sticky footer styles
 -------------------------------------------------- */
 html {

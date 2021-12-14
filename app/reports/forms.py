@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.admin.widgets import AdminDateWidget
+from django.forms import SplitDateTimeWidget
 from mailboxes.forms import PasswordForm
 from mailboxes.models import MailboxModel
 from shared_code.queries import get_user_owner_mailboxes_tuples
@@ -28,6 +29,8 @@ class MailboxValidateForm(PasswordForm):
 
 
 class ReportGenerateForm(forms.ModelForm):
+    start_at = forms.DateField()
+    end_at = forms.DateField()
 
     def is_valid(self, user) -> bool:
         if super().is_valid():
@@ -48,7 +51,7 @@ class ReportGenerateForm(forms.ModelForm):
     class Meta:
         model = ReportModel
         exclude = ['owner', 'mailbox', 'overall', 'messages_counter']
-        widgets = {
-            'start_at': AdminDateWidget(attrs={'type': 'date'}),
-            'end_at': AdminDateWidget(attrs={'type': 'date'}),
-        }
+        # widgets = {
+        #     'start_at': AdminDateWidget(attrs={'type': 'date'}),
+        #     'end_at': AdminDateWidget(attrs={'type': 'date'}),
+        # }
