@@ -32,7 +32,7 @@ services:
     
     depends_on:
       - rabbitmq
-      - postgres
+      - db
       - spamassasin
 
   db:

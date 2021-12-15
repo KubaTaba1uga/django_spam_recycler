@@ -10,7 +10,7 @@ I use some hacks over celery to make it happen and bypass IMAP limitations like,
 
 To allow for concurrent mailboxes analysis, workers are created dynamically for each user.
 Each user has its own worker and two queues. 
-Queue for downloading messages, for messages spam analysis.
+Queue for downloading messages and for messages spam analysis.
 
 To bypass IMAP simultaneous connections problem, each message is seperate task send to rabbitMQ,
 with retry policy and time delay. 
@@ -18,6 +18,8 @@ If connections collision is in place, system waits, and try again until the
 goal (downloading message) is accomplished.
 
 By default workers are deleted, each 24h, if there are no pending/active tasks in their queues.
+
+## App Usage
 
 
 ## 🚀 Features
