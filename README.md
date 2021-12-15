@@ -2,7 +2,7 @@
 
 I was curious, why Gmail/Exchange and other email providers, qualify messages as SPAM.
 
-As AI/ML is not my scope of interests, I've decided to use Apache Spamassasin - https://spamassassin.apache.org/ for emails analysis, as it provides reports with explanation of message qualification.
+As AI/ML is not my scope of interests, I've decided to use Apache Spamassasin - https://spamassassin.apache.org/ for emails analysis, as it provides reports with explanation why message was qualified.
 
 My month-work is small system which allows multiple users to analyze their mailboxes content concurrently.
 
@@ -10,7 +10,7 @@ I use some hacks over celery to make it happen and bypass IMAP limitations like,
 
 To allow for concurrent mailboxes analysis, workers are created dynamically for each user.
 Each user has its own worker and two queues. 
-Queue for downloading messages, for messages spam analysis.
+Queue for downloading messages, and queuefor spam analysis.
 
 To bypass IMAP simultaneous connections problem, each message is seperate task send to rabbitMQ,
 with retry policy and time delay. 
