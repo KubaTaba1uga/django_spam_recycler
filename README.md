@@ -75,10 +75,10 @@ $ docker-compose exec web-app python manage.py createsuperuser
 $ docker-compose build
 
 # Run Migrations
-$ docker-compose run --rm web python manage.py migrate
+$ docker-compose run --rm web-app python manage.py migrate
 
 # Create a Superuser
-$ docker-compose run --rm web python manage.py createsuperuser
+$ docker-compose run --rm web-app python manage.py createsuperuser
 
 # Run Django on http://localhost:8000/
 $ docker-compose up

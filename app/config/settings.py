@@ -199,3 +199,33 @@ if DEBUG:
     import socket
     hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
     INTERNAL_IPS = [ip[:-1] + "1" for ip in ips]
+    
+LOGGING = {
+"version": 1,
+"disable_existing_loggers": False,
+"root": {"level": "DEBUG", "handlers": ["file"]},
+"handlers": {
+    "file": {
+        "level": "DEBUG",
+        "class": "logging.FileHandler",
+        "filename": "/var/log/django.log",
+        "formatter": "app",
+    },
+},
+"loggers": {
+    "django": {
+        "handlers": ["file"],
+        "level": "DEBUG",
+        "propagate": True
+    },
+},
+"formatters": {
+    "app": {
+        "format": (
+            u"%(asctime)s [%(levelname)-8s] "
+            "(%(module)s.%(funcName)s) %(message)s"
+        ),
+        "datefmt": "%Y-%m-%d %H:%M:%S",
+    },
+},
+}
