@@ -41,9 +41,7 @@ https://user-images.githubusercontent.com/73971628/146213891-c2f7e226-2e82-428e-
 ## Table of Contents
 * **[Installation](#installation)**
   * [Docker](#docker)
-* [Setup](#setup)
-* [Contributing](#contributing)
-* [Support](#support)
+  * [Docker Usage](#docker usage)
 * [License](#license)
 
 ----
@@ -64,11 +62,6 @@ $ docker-compose exec web-app python manage.py migrate
 $ docker-compose exec web-app python manage.py createsuperuser
 # Load the site at http://127.0.0.1:8000
 ```
-
-## License
-
-[The MIT License](LICENSE)
-
 
 ## Docker Usage
 ```
@@ -95,3 +88,6 @@ $ docker-compose run --rm web-app pytest
 
 ```
 
+## License
+
+[The MIT License](LICENSE)
