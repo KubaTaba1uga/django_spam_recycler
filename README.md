@@ -50,7 +50,7 @@ By default workers are deleted, each 24h, if there are no pending/active tasks i
 ## 📖 Installation
 Spam Recycler can be installed via Docker.
 ```
-$ git clone https://github.com/wsvincent/djangox.git
+$ git clone https://github.com/KubaTaba1uga/spam_recycler
 $ cd spam_recycler
 ```
 

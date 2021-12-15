@@ -1,0 +1,49 @@
+@font-face {
+  font-family: brand;
+  src: url("CyberwayRiders-lg97d.e23edf0408da.ttf");
+}
+#brand-text {
+  font-family: brand;
+  font-size: 2em;
+}
+
+.w-35 {
+  width: 35%;
+}
+
+.my-small-btn {
+  width:80px;
+  padding:5px 10px;
+}
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  position: relative;
+  min-height: 100%;
+  font-size: 14px;
+}
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+
+.container {
+  max-width: 960px;
+}
+
+.pricing-header {
+  max-width: 700px;
+}
+
+
+body{
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+footer{
+  margin-top: auto;
+}
+

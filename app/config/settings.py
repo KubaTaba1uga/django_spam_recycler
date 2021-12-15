@@ -142,6 +142,39 @@ STATICFILES_DIRS = [str(BASE_DIR.joinpath('static'))]
 # http://whitenoise.evans.io/en/stable/django.html#add-compression-and-caching-support
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
+# LOGGING
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/3.2/topics/logging/
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "root": {"level": "DEBUG", "handlers": ["file"]},
+    "handlers": {
+        "file": {
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "filename": "/var/log/django.log",
+            "formatter": "app",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["file"],
+            "level": "DEBUG",
+            "propagate": True
+        },
+    },
+    "formatters": {
+        "app": {
+            "format": (
+                u"%(asctime)s [%(levelname)-8s] "
+                "(%(module)s.%(funcName)s) %(message)s"
+            ),
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+    },
+}
+
 # DJANGO-CRISPY-FORMS CONFIGS
 # ------------------------------------------------------------------------------
 # https://django-crispy-forms.readthedocs.io/en/latest/install.html#template-packs
@@ -157,6 +190,11 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html
 # https://docs.djangoproject.com/en/dev/ref/settings/#internal-ips
 INTERNAL_IPS = ['127.0.0.1']
+if DEBUG:
+    import socket
+    hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
+    INTERNAL_IPS = [ip[:-1] + "1" for ip in ips]
+    
 
 # CUSTOM USER MODEL CONFIGS
 # ------------------------------------------------------------------------------
@@ -193,39 +231,3 @@ RABBITMQ_VHOST = os.environ.get('RABBITMQ_VHOST')
 
 CELERY_BROKER_URL = f'amqp://{RABBITMQ_USERNAME}:{RABBITMQ_PASSWORD}@rabbitmq:5672/{RABBITMQ_VHOST}'
 
-# Django debug toolbar
-# ------------------------------------------------------------------------------
-if DEBUG:
-    import socket
-    hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
-    INTERNAL_IPS = [ip[:-1] + "1" for ip in ips]
-    
-LOGGING = {
-"version": 1,
-"disable_existing_loggers": False,
-"root": {"level": "DEBUG", "handlers": ["file"]},
-"handlers": {
-    "file": {
-        "level": "DEBUG",
-        "class": "logging.FileHandler",
-        "filename": "/var/log/django.log",
-        "formatter": "app",
-    },
-},
-"loggers": {
-    "django": {
-        "handlers": ["file"],
-        "level": "DEBUG",
-        "propagate": True
-    },
-},
-"formatters": {
-    "app": {
-        "format": (
-            u"%(asctime)s [%(levelname)-8s] "
-            "(%(module)s.%(funcName)s) %(message)s"
-        ),
-        "datefmt": "%Y-%m-%d %H:%M:%S",
-    },
-},
-}
