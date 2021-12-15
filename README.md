@@ -14,8 +14,9 @@ To bypass IMAP simultaneous connections problem, each message is seperate task s
 
 By default workers are deleted, each 24h, if there are no pending/active tasks in their queues.
 
-## App Usage
+## App Usage Example
 
+https://user-images.githubusercontent.com/73971628/146213891-c2f7e226-2e82-428e-ad74-c93e9f32bbab.mp4
 
 ## 🚀 Features
 
