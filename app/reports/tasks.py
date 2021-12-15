@@ -79,7 +79,8 @@ def generate_report_task(
     for folder in folder_list:
 
         for email_guid in gather_emails_GUIDs(mailbox_credentials=mailbox_credentials, folder=folder, search=search):
-
+            # add countdown to complete report's messages
+            #    counting, before message download start
             download_email_task.apply_async(
                 args=[email_guid,
                       mailbox_credentials, folder, report_id],
