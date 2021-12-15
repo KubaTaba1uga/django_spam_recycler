@@ -7,8 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-SECRET_KEY
 SECRET_KEY = os.environ.get("SECRET_KEY", default="oiasjd98123")
 # https://docs.djangoproject.com/en/dev/ref/settings/#debug
-# DEBUG = int(os.environ.get("DEBUG", default=0))
-DEBUG = True
+DEBUG = int(os.environ.get("DEBUG", default=0))
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS") or ["127.0.0.1", "localhost"]
 if type(ALLOWED_HOSTS) is str:
@@ -193,3 +192,9 @@ RABBITMQ_PASSWORD = os.environ.get('RABBITMQ_PASS')
 RABBITMQ_VHOST = os.environ.get('RABBITMQ_VHOST')
 
 CELERY_BROKER_URL = f'amqp://{RABBITMQ_USERNAME}:{RABBITMQ_PASSWORD}@rabbitmq:5672/{RABBITMQ_VHOST}'
+
+# Django debug toolbar
+# ------------------------------------------------------------------------------
+import socket
+hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
+INTERNAL_IPS = [ip[:-1] + "1" for ip in ips]

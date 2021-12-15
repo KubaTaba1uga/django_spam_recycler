@@ -14,10 +14,10 @@ USER = {
 
 MAILBOX = {
     'email_address':
-        os.environ.get('TEST_EMAIL_ADDRESS', 'Testy_Intune@lemonpro.eu'),
+        os.environ.get('TEST_EMAIL_ADDRESS', 'jakub@lemonpro.eu'),
     'server_address':
         os.environ.get('TEST_SERVER_ADDRESS', 'Outlook.office365.com'),
-    'password': os.environ.get('TEST_EMAIL_PASSWORD', 'Yun78673'),
+    'password': os.environ.get('TEST_EMAIL_PASSWORD', '************'),
 }
 
 
