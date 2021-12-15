@@ -41,7 +41,7 @@ https://user-images.githubusercontent.com/73971628/146213891-c2f7e226-2e82-428e-
 ## Table of Contents
 * **[Installation](#installation)**
   * [Docker](#docker)
-  * [Docker Usage](#docker usage)
+  * [Docker Usage](#docker-usage)
 * [License](#license)
 
 ----
