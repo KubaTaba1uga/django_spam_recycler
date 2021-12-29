@@ -1,7 +1,5 @@
 FROM debian:stretch
 
-MAINTAINER Christian Luginbühl <dinkel@pimprecords.com>
-
 ENV SPAMASSASSIN_VERSION 3.4.2
 
 # Install spamassassin & # supervisor

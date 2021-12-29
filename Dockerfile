@@ -22,7 +22,8 @@ RUN pip3 install poetry
 RUN poetry config virtualenvs.create false
 COPY pyproject.toml /code/
 RUN poetry install --no-dev
-
+# Poetry ignores setuptools in .toml file
+RUN poetry run pip install 'setuptools>=59.2.0,<59.7.0'
 # Copy project
 COPY ./app /code/
 
